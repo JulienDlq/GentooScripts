@@ -8,9 +8,16 @@ partage="//${serveur}/${dossier}"
 point_de_montage="/tmp/savedest"
 sauvegarde="${point_de_montage}/SIMPLICITY"
 
-# Sources contient une liste de fichiers et/ou de dossiers
-# À compléter...
-sources=""
+# Sources contient une liste de fichiers et/ou de dossiers à sauvegarder
+# Dossier de configurations des logiciels
+# Fichier .config contenant la configuration du noyau courrant
+# Fichier world contenant la liste des packets explicitement installés par l'utilisateur
+# À compléter au besoin...
+sources="\
+/etc/ \
+/usr/src/linux/.config \
+/var/lib/portage/world \
+"
 
 if [[ "$sources" == "" ]]
 then
