@@ -6,6 +6,9 @@
 # Chargement de la configuration du script
 . ./gentoo-save-config
 
+# Récupération de la date
+date=$(date +%F-%H%M)
+
 if [[ "$sources" == "" ]]
 then
 	echo "Sources vide ! Configurer la variable \"sources\" et recommencer"
@@ -23,10 +26,15 @@ then
 	fi
 fi
 
-for source in "$sources"
-do
-        rsync -rRtzuc --progress $source ${sauvegarde}/
-done
+# Vérifier s'il existe une archive sur laquelle se baser
+archive="$(ls -1t ${sauvegarde} | head -n1 | grep .tar.gz)"
+if [[ "$archive" != "" && "$archive" != "${date}.tar.gz" ]]
+then
+	cp ${sauvegarde}/$archive ${sauvegarde}/${date}.tar.gz
+fi
+
+# Mise à jour de l'archive (ou création s'il n'existait pas d'archive sur laquelle se baser
+tar uPvf ${sauvegarde}/${date}.tar.gz $sources
 
 if [[ -d $sauvegarde ]]
 then
