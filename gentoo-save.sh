@@ -2,11 +2,16 @@
 
 . ./init
 
-serveur="Zone51"
+# Serveur accueillant la sauvegarde (préciser le nom d'hôte du serveur ou son adresse IP)
+serveur="SERVERNAME"
+# Dossier sur le serveur accueillant la sauvegarde (par défaut le nom d'hôte ou l'adresse IP du serveur)
 dossier="$serveur"
+# Partage qui sera ainsi utilisé
 partage="//${serveur}/${dossier}"
+# Point de montage du partage
 point_de_montage="/tmp/savedest"
-sauvegarde="${point_de_montage}/SIMPLICITY"
+# Destination de la sauvegarde (préciser le nom d'hôte de la Gentoo pour plus de facilité)
+sauvegarde="${point_de_montage}/GENTOOHOSTNAME"
 
 # Sources contient une liste de fichiers et/ou de dossiers à sauvegarder
 # Dossier de configurations des logiciels
