@@ -1,28 +1,10 @@
 #!/bin/bash
 
+# Initialisation du script
 . ./init
 
-# Serveur accueillant la sauvegarde (préciser le nom d'hôte du serveur ou son adresse IP)
-serveur="SERVERNAME"
-# Dossier sur le serveur accueillant la sauvegarde (par défaut le nom d'hôte ou l'adresse IP du serveur)
-dossier="$serveur"
-# Partage qui sera ainsi utilisé
-partage="//${serveur}/${dossier}"
-# Point de montage du partage
-point_de_montage="/tmp/savedest"
-# Destination de la sauvegarde (préciser le nom d'hôte de la Gentoo pour plus de facilité)
-sauvegarde="${point_de_montage}/GENTOOHOSTNAME"
-
-# Sources contient une liste de fichiers et/ou de dossiers à sauvegarder
-# Dossier de configurations des logiciels
-# Fichier .config contenant la configuration du noyau courrant
-# Fichier world contenant la liste des packets explicitement installés par l'utilisateur
-# À compléter au besoin...
-sources="\
-/etc/ \
-/usr/src/linux/.config \
-/var/lib/portage/world \
-"
+# Chargement de la configuration du script
+. ./gentoo-save-config
 
 if [[ "$sources" == "" ]]
 then
