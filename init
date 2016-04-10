@@ -1,0 +1,9 @@
+# Make sure only root can run our script
+
+SCRIPT=$(basename $0)
+
+if [ "$(id -u)" != "0" ]; then
+	echo "Utiliser sudo pour lancer le script $SCRIPT" 1>&2
+	exit 1
+fi
+
