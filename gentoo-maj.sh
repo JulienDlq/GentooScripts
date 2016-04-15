@@ -10,7 +10,7 @@ MESSAGE_OK="Tout s'est bien passé. ;-)"
 MESSAGE_KO="Il y a eu un soucis... :-S"
 MESSAGE_NA="Il y n'y a pas de mise à jour à faire... :-O"
 MESSAGE_FATAL="Il y a eu une erreur fatale non gérée... x.x"
-JOURNAL_DOSSIER="${HOME}/Log"
+JOURNAL_DOSSIER="/var/log/gentooscripts"
 JOURNAL_DATE=$(date +%F-%H%M%S).log
 FORCE=0
 
