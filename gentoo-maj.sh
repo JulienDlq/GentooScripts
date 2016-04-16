@@ -4,7 +4,11 @@ SCRIPTNAME=$(basename $0)
 SCRIPTPATH=$(dirname $0)
 cd $SCRIPTPATH
 
+# Initialisation du script
 . ./init
+
+# Chargement de la configuration du script
+. ./gentoo-maj-config
 
 #----------
 # VARIABLES
@@ -17,6 +21,19 @@ MESSAGE_FATAL="Il y a eu une erreur fatale non gérée... x.x"
 JOURNAL_DOSSIER="/var/log/gentooscripts"
 JOURNAL_DATE=$(date +%F-%H%M%S).log
 FORCE=0
+
+if [[ $SETVERBOSE -eq 1 ]]
+then
+	VERBOSE="--verbose"
+else
+	VERBOSE=""
+fi
+if [[ $SETQUIET -eq 1 ]]
+then
+	QUIET="--quiet-build y"
+else
+	QUIET="--quiet-build n"
+fi
 
 mkdir -p $JOURNAL_DOSSIER
 
@@ -140,7 +157,7 @@ fi
 
 FONCTION="emerge-world"
 initialiseJournalScript $FONCTION
-emerge -vNuD --with-bdeps=y @world
+emerge $VERBOSE $QUIET -NuD --with-bdeps=y @world
 RESULTAT=$?
 messageJournalScript $RESULTAT $FONCTION
 finaliseJournalScript $FONCTION
@@ -148,7 +165,7 @@ rafraichissementEnvironnement
 
 FONCTION="emerge-preserved-rebuild"
 initialiseJournalScript $FONCTION
-emerge -v @preserved-rebuild
+emerge $VERBOSE $QUIET @preserved-rebuild
 RESULTAT=$?
 messageJournalScript $RESULTAT $FONCTION
 finaliseJournalScript $FONCTION
@@ -156,15 +173,15 @@ rafraichissementEnvironnement
 
 FONCTION="emerge-c"
 initialiseJournalScript $FONCTION
-emerge -vc
+emerge $VERBOSE $QUIET -c
 RESULTAT=$?
 messageJournalScript $RESULTAT $FONCTION
 finaliseJournalScript $FONCTION
 rafraichissementEnvironnement
 
-FONCTION="preserved-rebuild"
+FONCTION="emerge-preserved-rebuild"
 initialiseJournalScript $FONCTION
-emerge -v @preserved-rebuild
+emerge $VERBOSE $QUIET @preserved-rebuild
 RESULTAT=$?
 messageJournalScript $RESULTAT $FONCTION
 finaliseJournalScript $FONCTION
@@ -172,7 +189,7 @@ rafraichissementEnvironnement
 
 FONCTION="revdep-rebuild"
 initialiseJournalScript $FONCTION
-revdep-rebuild
+revdep-rebuild -- $VERBOSE $QUIET
 RESULTAT=$?
 messageJournalScript $RESULTAT $FONCTION
 finaliseJournalScript $FONCTION
@@ -180,7 +197,7 @@ rafraichissementEnvironnement
 
 FONCTION="etc-update"
 initialiseJournalScript $FONCTION
-etc-update
+etc-update $VERBOSE
 RESULTAT=$?
 messageJournalScript $RESULTAT $FONCTION
 finaliseJournalScript $FONCTION

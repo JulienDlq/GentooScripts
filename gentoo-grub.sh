@@ -4,6 +4,7 @@ SCRIPTNAME=$(basename $0)
 SCRIPTPATH=$(dirname $0)
 cd $SCRIPTPATH
 
+# Initialisation du script
 . ./init
 
 mount /boot
