@@ -112,6 +112,14 @@ function rafraichissementEnvironnement
 
 case $1 in
 -sync)
+	FONCTION="layman-S"
+	initialiseJournalScript $FONCTION
+	layman $VERBOSE -S
+	RESULTAT=$?
+	messageJournalScript $RESULTAT $FONCTION
+	finaliseJournalScript $FONCTION
+	rafraichissementEnvironnement
+
 	FONCTION="eix-sync"
 	initialiseJournalScript $FONCTION
 	eix-sync
