@@ -1,6 +1,9 @@
 # Passphrase de la sauvegarde
 passphrase=""
 
+# Protocole pour la sauvegarde
+protocole="file"
+
 # Dossier accueillant la sauvegarde
 sauvegarde=""
 

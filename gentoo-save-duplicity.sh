@@ -21,7 +21,7 @@ fi
 for target in $sources
 do
 	export PASSPHRASE=$passphrase
-	duplicity $target file://$sauvegarde/$(basename $target | sed 's/\.//g' )/
+	duplicity $target ${protocole}://${sauvegarde}/$(basename $target | sed 's/\.//g' )/
 done
 
 exit 0
