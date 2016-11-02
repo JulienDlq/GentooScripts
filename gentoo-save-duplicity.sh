@@ -22,6 +22,7 @@ for target in $sources
 do
 	export PASSPHRASE=$passphrase
 	duplicity $target ${protocole}://${sauvegarde}/$(basename $target | sed 's/\.//g' )/
+	unset PASSPHRASE
 done
 
 exit 0
