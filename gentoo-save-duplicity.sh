@@ -20,6 +20,7 @@ fi
 # Création de la nouvelle archive incrémentale
 for target in $sources
 do
+	echo "Sauvegarde de la cible : $target"
 	export PASSPHRASE=$passphrase
 	duplicity $target ${protocole}://${sauvegarde}/$(basename $target | sed 's/\.//g' )/
 	unset PASSPHRASE
