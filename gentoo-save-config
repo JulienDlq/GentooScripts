@@ -1,3 +1,6 @@
+# Type de sauvegarde (par défaut samba, mais locale est également disponible)
+type="samba"
+
 # Serveur accueillant la sauvegarde (préciser le nom d'hôte du serveur ou son adresse IP)
 serveur="SERVERNAME"
 # Dossier sur le serveur accueillant la sauvegarde (par défaut le nom d'hôte ou l'adresse IP du serveur)
