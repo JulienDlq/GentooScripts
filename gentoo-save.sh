@@ -10,6 +10,26 @@ cd $SCRIPTPATH
 # Chargement de la configuration du script
 . ./gentoo-save-config
 
+# Si la sauvegarde n'est pas locale et que la configuration correspondante est paramétrée, alors on configure le partage
+if [[ "$type" != "local" && "$server" != "" && "$dossier" != "" ]]
+then
+	# Partage qui sera ainsi utilisé
+	partage="//${serveur}/${dossier}"
+# Et si la sauvegarde est locale, alors pas besoin de partage
+elif [[ "$type" == "local" ]]
+then
+	partage=""
+else
+	echo "Ce type n'est pas encore géré ! (type = $type)"
+	exit 1
+fi
+
+# Si la configuration correspondante est paramétrée, alors on configure la destination de la sauvegarde
+if [[ "$destination_racine" != "" && "$hote" != "" ]]
+then
+	sauvegarde="${destination_racine}/${hote}"
+fi
+
 # Nom de la liste de sauvegarde
 liste="sauvegarde.list"
 
@@ -20,16 +40,24 @@ then
 	exit 1
 fi
 
-# Monter le dossier de sauvegarde si ce n'est déjà fait
-if [[ ! -d $sauvegarde ]]
+# Si la sauvegarde n'est pas locale, monter le dossier de sauvegarde si ce n'est déjà fait
+if [[ "$type" != "local" && ! -d $sauvegarde ]]
 then
-	mkdir -p $point_de_montage
-	mount -t cifs -o guest $partage $point_de_montage
+	mkdir -p $destination_racine
+	mount -t cifs -o guest $partage $destination_racine
 	if [[ $? -ne 0 ]]
 	then
 		echo "Erreur non gérée"
 		exit 1
 	fi
+	mkdir -p $sauvegarde
+# Si la sauvegarde est locale, créer le dossier de sauvegarde si ce n'est déjà fait
+elif [[ "$type" == "local" && ! -d $sauvegarde ]]
+then
+	mkdir -p $sauvegarde
+else
+	echo "Ce type n'est pas encore géré ! (type = $type)"
+	exit 1
 fi
 
 # Récupérer l'ID de l'archive courante
@@ -73,11 +101,11 @@ else
 	exit 1
 fi
 
-# Démonter le dossier de sauvegarde si ce n'est déjà fait
-if [[ -d $sauvegarde ]]
+# Si la sauvegarde n'est pas locale, démonter le dossier de sauvegarde si ce n'est déjà fait
+if [[ "$type" != "local" && -d $sauvegarde ]]
 then
-	umount $point_de_montage
-	rmdir $point_de_montage
+	umount $destination_racine
+	rmdir $destination_racine
 fi
 
 exit 0
