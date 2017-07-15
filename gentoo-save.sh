@@ -56,8 +56,7 @@ elif [[ "$type" == "local" && ! -d $sauvegarde ]]
 then
 	mkdir -p $sauvegarde
 else
-	echo "Ce type n'est pas encore géré ! (type = $type)"
-	exit 1
+	echo "Le dossier de sauvegarde est déjà présent (sauvegarde = $sauvegarde)"
 fi
 
 # Récupérer l'ID de l'archive courante
