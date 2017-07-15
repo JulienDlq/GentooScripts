@@ -11,7 +11,7 @@ cd $SCRIPTPATH
 . ./gentoo-save-config
 
 # Si la sauvegarde n'est pas locale et que la configuration correspondante est paramétrée, alors on configure le partage
-if [[ "$type" != "local" && "$server" != "" && "$dossier" != "" ]]
+if [[ "$type" != "local" && "$serveur" != "" && "$dossier" != "" ]]
 then
 	# Partage qui sera ainsi utilisé
 	partage="//${serveur}/${dossier}"
