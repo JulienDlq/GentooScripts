@@ -10,8 +10,8 @@ cd $SCRIPTPATH
 # Chargement de la configuration du script
 . ./gentoo-save-config
 
-# Si la sauvegarde n'est pas locale et que la configuration correspondante est paramétrée, alors on configure le partage
-if [[ "$type" != "local" && "$serveur" != "" && "$dossier" != "" ]]
+# Si la sauvegarde est samba et que la configuration correspondante est paramétrée, alors on configure le partage
+if [[ "$type" == "samba" && "$serveur" != "" && "$dossier" != "" ]]
 then
 	# Partage qui sera ainsi utilisé
 	partage="//${serveur}/${dossier}"
@@ -19,6 +19,12 @@ then
 elif [[ "$type" == "local" ]]
 then
 	partage=""
+# Et si la sauvegarde est samba et que la configuration correspondante n'est pas paramétrée, alors on s'arrête
+elif [[ "$type" == "samba" && "$serveur" == "" && "$dossier" == "" ]]
+then
+	echo "Les variables serveur et dossier ne sont pas paramétrées pour ce type ($type)"
+	exit 1
+# Dans tous les autres cas on s'arrête…
 else
 	echo "Ce type n'est pas encore géré ! (type = $type)"
 	exit 1
