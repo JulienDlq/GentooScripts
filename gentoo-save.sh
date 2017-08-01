@@ -39,10 +39,34 @@ fi
 # Nom de la liste de sauvegarde
 liste="sauvegarde.list"
 
-# Vérifier si les sources existent
+# Vérifier si les sources sont paramétrées
 if [[ "$sources" == "" ]]
 then
 	echo "Sources vide ! Configurer la variable \"sources\" et recommencer"
+	exit 1
+fi
+
+# Chaque source doit exister sur le système
+source_inexistante_declanchee=0
+sources_inexistantes=""
+for source_courante in $sources
+do
+	if [[ ! -e $source_courante ]]
+	then
+		source_inexistante_declanchee=1
+		sources_inexistantes="$sources_inexistantes $source_courante"
+	fi
+done
+
+# Dans le cas où une ou plusieurs sources n'existent pas prévenir l'utilisateur
+if (( $source_inexistante_declanchee ))
+then
+	if [[ $( echo $sources_inexistantes | wc -w ) == 1 ]]
+	then
+		echo "La source$sources_inexistantes n'existe pas sur le système de fichier"
+	else
+		echo "Les sources$sources_inexistantes n'existent pas sur le système de fichier"
+	fi
 	exit 1
 fi
 
