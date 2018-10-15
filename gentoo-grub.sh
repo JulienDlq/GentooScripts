@@ -50,7 +50,7 @@ if [[ ${#KernelVersions[*]} -eq 0 ]]
 then
 	echo "Pas de noyau à supprimer."
 else
-	echo "Le(s) noyau(x) suivant(s) sont supprimés :"
+	echo "Le(s) noyau(x) suivant(s) est(sont) supprimé(s) :"
 fi
 for Kernel in ${KernelVersions[*]}
 do
