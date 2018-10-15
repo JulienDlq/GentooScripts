@@ -163,7 +163,23 @@ then
 	rafraichissementEnvironnement
 fi
 
-FONCTION="emerge-world"
+FONCTION="emerge-world--update"
+initialiseJournalScript $FONCTION
+emerge $VERBOSE $QUIET -u --with-bdeps=y @world
+RESULTAT=$?
+messageJournalScript $RESULTAT $FONCTION
+finaliseJournalScript $FONCTION
+rafraichissementEnvironnement
+
+FONCTION="emerge-world--update-new-use)"
+initialiseJournalScript $FONCTION
+emerge $VERBOSE $QUIET -Nu --with-bdeps=y @world
+RESULTAT=$?
+messageJournalScript $RESULTAT $FONCTION
+finaliseJournalScript $FONCTION
+rafraichissementEnvironnement
+
+FONCTION="emerge-world--update-new-use-deep)"
 initialiseJournalScript $FONCTION
 emerge $VERBOSE $QUIET -NuD --with-bdeps=y @world
 RESULTAT=$?
