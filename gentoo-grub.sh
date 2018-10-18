@@ -13,7 +13,7 @@ NBMAXKERNEL=2
 # Monter la partition de boot
 mount /boot
 
-# Affichage du nombre de noyaux présents
+# Affichage du nombre de noyaux présents dans /boot
 KernelVersions=($(ls -1 /boot/*gentoo | sed 's/.*-x86_64-//' | sort -V | uniq))
 echo -n "Il y a "${#KernelVersions[*]}" Noyau(x) dans /boot => "
 if [[ ${#KernelVersions[*]} -gt $NBMAXKERNEL ]]
@@ -45,7 +45,7 @@ do
 done
 echo
 
-# Suppression des versions obsolètes
+# Suppression des versions obsolètes dans /boot
 if [[ ${#KernelVersions[*]} -eq 0 ]]
 then
 	echo "Pas de noyau à supprimer."
@@ -56,6 +56,52 @@ for Kernel in ${KernelVersions[*]}
 do
     echo "- "${Kernel}
 	rm /boot/*-x86_64-${Kernel}
+done
+echo
+
+# Affichage du nombre de noyaux présents dans /usr/src
+KernelVersions=($(ls -1d /usr/src/*gentoo | sed 's/.*linux-//' | sort -V | uniq))
+echo -n "Il y a "${#KernelVersions[*]}" Noyau(x) dans /usr/src => "
+if [[ ${#KernelVersions[*]} -gt $NBMAXKERNEL ]]
+then
+	echo "Il serait temps de faire du ménage !"
+elif [[ ${#KernelVersions[*]} -eq $NBMAXKERNEL ]]
+then
+	echo "Ok."
+else
+	echo "Il y a moins de noyau(x) que le max prévu ("$NBMAXKERNEL")."
+	NBMAXKERNEL=${#KernelVersions[*]}
+fi
+echo
+
+# Affichage de ces noyaux
+echo "Liste de(s) noyau(x) :"
+for Kernel in ${KernelVersions[*]}
+do
+    echo "- "${Kernel}
+done
+echo
+
+# Affichage des noyaux à conserver
+echo "Il faudrait conserver le(s) noyau(x) suivant(s) :"
+for (( Kernel=1 ; Kernel <= $NBMAXKERNEL ; Kernel++ ))
+do
+	echo "- "${KernelVersions[-1]}
+	unset KernelVersions[-1]
+done
+echo
+
+# Suppression des versions obsolètes dans /usr/src
+if [[ ${#KernelVersions[*]} -eq 0 ]]
+then
+	echo "Pas de noyau à supprimer."
+else
+	echo "Le(s) noyau(x) suivant(s) est(sont) supprimé(s) :"
+fi
+for Kernel in ${KernelVersions[*]}
+do
+    echo "- "${Kernel}
+	rm -rf /usr/src/linux-${Kernel}
 done
 echo
 
