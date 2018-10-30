@@ -23,11 +23,25 @@ do
 	# Monter la partition
 	if [[ $Chemin == ${BOOT} ]]
 	then
-		echo "La partition "${Chemin}" va être montée."
-		mount ${Chemin}
+		# Vérification pour éviter d'avoir des messages d'erreur prévisible
+		# de la commande mount
+		mount | grep $Chemin 2>/dev/null 1>&2
+		if [[ $? -eq 1 ]]
+		then
+			echo "La partition "${Chemin}" va être montée."
+			mount ${Chemin}
+		elif [[ $? -eq 0 ]]
+		then
+			echo "La partition "${Chemin}" est déjà montée."
+		else
+			eche "Erreur non gérée (Montage "${Chemin}")"
+			exit 1
+		fi
+		echo
 	elif [[ $Chemin == ${SRC} ]]
 	then
-		echo "Aucune partition à monter."
+		# Pas d'opération spécifique pour ce $Chemin
+		test
 	else
 		# On ne devrait jamais passer par ici, mais au moins on s'évite quelques problèmes
 		# le jour où on modifie la liste des chemins possibles sans avoir aussi modifié
@@ -35,7 +49,6 @@ do
 		echo "Le chemin "${Chemin}" est inconnu !"
 		exit 1
 	fi
-	echo
 
 	# Récupération du chemin
 	if [[ $Chemin == ${BOOT} ]]
@@ -51,6 +64,7 @@ do
 		echo "Le chemin "${Chemin}" est inconnu !"
 		exit 1
 	fi
+
 	# Affichage du nombre de noyaux présents dans ${Chemin}
 	echo -n "Il y a "${#KernelVersions[*]}" Noyau(x) dans "${Chemin}" => "
 	if [[ ${#KernelVersions[*]} -gt $NBMAXKERNEL ]]
@@ -116,10 +130,11 @@ do
 	then
 		echo "La configuration de grub va être modifée."
 		grub-mkconfig -o ${BOOT}/grub/grub.cfg
+		echo
 	elif [[ $Chemin == ${SRC} ]]
 	then
-		# NOP
-		echo "La configuration de grub n'a pas besoin d'être modifée."
+		# Pas d'opération spécifique pour ce $Chemin
+		test
 	else
 		# On ne devrait jamais passer par ici, mais au moins on s'évite quelques problèmes
 		# le jour où on modifie la liste des chemins possibles sans avoir aussi modifié
@@ -127,16 +142,29 @@ do
 		echo "Le chemin "${Chemin}" est inconnu !"
 		exit 1
 	fi
-	echo
 
 	# Démonter la partition
 	if [[ $Chemin == ${BOOT} ]]
 	then
-		echo "La partition "${Chemin}" va être démontée."
-		umount ${Chemin}
+		# Vérification pour éviter d'avoir des messages d'erreur prévisible
+		# de la commande umount
+		mount | grep $Chemin 2>/dev/null 1>&2
+		if [[ $? -eq 0 ]]
+		then
+			echo "La partition "${Chemin}" va être démontée."
+			umount ${Chemin}
+		elif [[ $? -eq 1 ]]
+		then
+			echo "La partition "${Chemin}" est déjà démontée."
+		else
+			eche "Erreur non gérée (Démontage "${Chemin}")"
+			exit 1
+		fi
+		echo
 	elif [[ $Chemin == ${SRC} ]]
 	then
-		echo "Aucune partition à démonter."
+		# Pas d'opération spécifique pour ce $Chemin
+		test
 	else
 		# On ne devrait jamais passer par ici, mais au moins on s'évite quelques problèmes
 		# le jour où on modifie la liste des chemins possibles sans avoir aussi modifié
@@ -144,7 +172,6 @@ do
 		echo "Le chemin "${Chemin}" est inconnu !"
 		exit 1
 	fi
-	echo
 
 done
 
