@@ -26,15 +26,16 @@ do
 		# Vérification pour éviter d'avoir des messages d'erreur prévisible
 		# de la commande mount
 		mount | grep $Chemin 2>/dev/null 1>&2
-		if [[ $? -eq 1 ]]
+		result=$?
+		if [[ $result -eq 1 ]]
 		then
 			echo "La partition "${Chemin}" va être montée."
 			mount ${Chemin}
-		elif [[ $? -eq 0 ]]
+		elif [[ $result -eq 0 ]]
 		then
 			echo "La partition "${Chemin}" est déjà montée."
 		else
-			eche "Erreur non gérée (Montage "${Chemin}")"
+			echo "Erreur non gérée (Montage "${Chemin}")"
 			exit 1
 		fi
 		echo
@@ -149,15 +150,16 @@ do
 		# Vérification pour éviter d'avoir des messages d'erreur prévisible
 		# de la commande umount
 		mount | grep $Chemin 2>/dev/null 1>&2
-		if [[ $? -eq 0 ]]
+		result=$?
+		if [[ $result -eq 0 ]]
 		then
 			echo "La partition "${Chemin}" va être démontée."
 			umount ${Chemin}
-		elif [[ $? -eq 1 ]]
+		elif [[ $result -eq 1 ]]
 		then
 			echo "La partition "${Chemin}" est déjà démontée."
 		else
-			eche "Erreur non gérée (Démontage "${Chemin}")"
+			echo "Erreur non gérée (Démontage "${Chemin}")"
 			exit 1
 		fi
 		echo
