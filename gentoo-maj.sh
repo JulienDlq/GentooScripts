@@ -40,6 +40,22 @@ mkdir -p $JOURNAL_DOSSIER
 #----------
 # FONCTIONS
 #----------
+function lancer
+{
+	FONCTION=$1
+	COMMANDE=$2
+	RAFRAICHIR=$3
+	initialiseJournalScript $FONCTION
+	eval $COMMANDE
+	RESULTAT=$?
+	messageJournalScript $RESULTAT $FONCTION
+	finaliseJournalScript $FONCTION
+	if eval $RAFRAICHIR
+	then
+		rafraichissementEnvironnement
+	fi
+}
+
 function initialiseJournalScript
 {
 	FONCTION=$1
@@ -88,22 +104,15 @@ function messageJournalScript
 	fi
 }
 
-
 function rafraichissementEnvironnement
 {
 	FONCTION="env-update"
-	initialiseJournalScript $FONCTION
-	env-update
-	RESULTAT=$?
-	messageJournalScript $RESULTAT $FONCTION
-	finaliseJournalScript $FONCTION
+	COMMANDE="env-update"
+	lancer $FONCTION "$COMMANDE" false
 
 	FONCTION="source-etc-profile"
-	initialiseJournalScript $FONCTION
-	source /etc/profile
-	RESULTAT=$?
-	messageJournalScript $RESULTAT $FONCTION
-	finaliseJournalScript $FONCTION
+	COMMANDE="source /etc/profile"
+	lancer $FONCTION "$COMMANDE" false
 }
 
 #------------
@@ -113,20 +122,12 @@ function rafraichissementEnvironnement
 case $1 in
 -sync)
 	FONCTION="layman-S"
-	initialiseJournalScript $FONCTION
-	layman $VERBOSE -S
-	RESULTAT=$?
-	messageJournalScript $RESULTAT $FONCTION
-	finaliseJournalScript $FONCTION
-	rafraichissementEnvironnement
+	COMMANDE="layman $VERBOSE -S"
+	lancer $FONCTION "$COMMANDE" true
 
 	FONCTION="eix-sync"
-	initialiseJournalScript $FONCTION
-	eix-sync
-	RESULTAT=$?
-	messageJournalScript $RESULTAT $FONCTION
-	finaliseJournalScript $FONCTION
-	rafraichissementEnvironnement
+	COMMANDE="eix-sync"
+	lancer $FONCTION "$COMMANDE" true
 ;;
 -nosync)
 ;;
@@ -145,8 +146,8 @@ case $2 in
 	initialiseJournalScript $FONCTION
 	FORCE=1
 	RESULTAT=$?
-        messageJournalScript $RESULTAT $FONCTION
-        finaliseJournalScript $FONCTION
+    messageJournalScript $RESULTAT $FONCTION
+    finaliseJournalScript $FONCTION
 ;;
 *|"")
 ;;
@@ -155,84 +156,44 @@ esac
 if [[ FORCE -eq 0 ]]
 then
 	FONCTION="eix-diff"
-	initialiseJournalScript $FONCTION
-	eix-diff | grep -E '\[.*U.*]'
-	RESULTAT=$?
-	messageJournalScript $RESULTAT $FONCTION
-	finaliseJournalScript $FONCTION
-	rafraichissementEnvironnement
+	COMMANDE="eix-diff | grep -E '\[.*U.*]'"
+	lancer $FONCTION "$COMMANDE" true
 fi
 
 FONCTION="emerge-world--update"
-initialiseJournalScript $FONCTION
-emerge $VERBOSE $QUIET -u --with-bdeps=y @world
-RESULTAT=$?
-messageJournalScript $RESULTAT $FONCTION
-finaliseJournalScript $FONCTION
-rafraichissementEnvironnement
+COMMANDE="emerge $VERBOSE $QUIET -u --with-bdeps=y @world"
+lancer $FONCTION "$COMMANDE" true
 
 FONCTION="emerge-world--update-new-use)"
-initialiseJournalScript $FONCTION
-emerge $VERBOSE $QUIET -Nu --with-bdeps=y @world
-RESULTAT=$?
-messageJournalScript $RESULTAT $FONCTION
-finaliseJournalScript $FONCTION
-rafraichissementEnvironnement
+COMMANDE="emerge $VERBOSE $QUIET -Nu --with-bdeps=y @world"
+lancer $FONCTION "$COMMANDE" true
 
 FONCTION="emerge-world--update-new-use-deep)"
-initialiseJournalScript $FONCTION
-emerge $VERBOSE $QUIET -NuD --with-bdeps=y @world
-RESULTAT=$?
-messageJournalScript $RESULTAT $FONCTION
-finaliseJournalScript $FONCTION
-rafraichissementEnvironnement
+COMMANDE="emerge $VERBOSE $QUIET -NuD --with-bdeps=y @world"
+lancer $FONCTION "$COMMANDE" true
 
 FONCTION="emerge-preserved-rebuild"
-initialiseJournalScript $FONCTION
-emerge $VERBOSE $QUIET @preserved-rebuild
-RESULTAT=$?
-messageJournalScript $RESULTAT $FONCTION
-finaliseJournalScript $FONCTION
-rafraichissementEnvironnement
+COMMANDE="emerge $VERBOSE $QUIET @preserved-rebuild"
+lancer $FONCTION "$COMMANDE" true
 
 FONCTION="emerge-c"
-initialiseJournalScript $FONCTION
-emerge $VERBOSE $QUIET -c
-RESULTAT=$?
-messageJournalScript $RESULTAT $FONCTION
-finaliseJournalScript $FONCTION
-rafraichissementEnvironnement
+COMMANDE="emerge $VERBOSE $QUIET -c"
+lancer $FONCTION "$COMMANDE" true
 
 FONCTION="emerge-preserved-rebuild"
-initialiseJournalScript $FONCTION
-emerge $VERBOSE $QUIET @preserved-rebuild
-RESULTAT=$?
-messageJournalScript $RESULTAT $FONCTION
-finaliseJournalScript $FONCTION
-rafraichissementEnvironnement
+COMMANDE="emerge $VERBOSE $QUIET @preserved-rebuild"
+lancer $FONCTION "$COMMANDE" true
 
 FONCTION="revdep-rebuild"
-initialiseJournalScript $FONCTION
-revdep-rebuild -- $VERBOSE $QUIET
-RESULTAT=$?
-messageJournalScript $RESULTAT $FONCTION
-finaliseJournalScript $FONCTION
-rafraichissementEnvironnement
+COMMANDE="revdep-rebuild -- $VERBOSE $QUIET"
+lancer $FONCTION "$COMMANDE" true
 
 FONCTION="etc-update"
-initialiseJournalScript $FONCTION
-etc-update $VERBOSE
-RESULTAT=$?
-messageJournalScript $RESULTAT $FONCTION
-finaliseJournalScript $FONCTION
-rafraichissementEnvironnement
+COMMANDE="etc-update $VERBOSE"
+lancer $FONCTION "$COMMANDE" true
 
 FONCTION="eclean-distfiles"
-initialiseJournalScript $FONCTION
-eclean -v distfiles
-RESULTAT=$?
-messageJournalScript $RESULTAT $FONCTION
-finaliseJournalScript $FONCTION
-rafraichissementEnvironnement
+COMMANDE="eclean -v distfiles"
+lancer $FONCTION "$COMMANDE" true
 
 exit 0
