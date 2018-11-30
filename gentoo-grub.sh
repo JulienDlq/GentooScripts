@@ -76,6 +76,7 @@ do
 		echo "Ok."
 	else
 		echo "Il y a moins de noyau(x) que le max prévu ("$NBMAXKERNEL")."
+		SAVENBMAXKERNEL=$NBMAXKERNEL
 		NBMAXKERNEL=${#KernelVersions[*]}
 	fi
 	echo
@@ -96,6 +97,14 @@ do
 		unset KernelVersions[-1]
 	done
 	echo
+
+	# Réinitialisation de NBMAXKERNEL
+	# dans le cas où le nombre de noyaux présents
+	# est plus petit que le nombre de noyaux à conserver
+	if [[ ! -z $SAVENBMAXKERNEL ]]
+	then
+		NBMAXKERNEL=$SAVENBMAXKERNEL
+	fi
 
 	# Récupération du prefixe
 	if [[ $Chemin == ${BOOT} ]]
