@@ -54,10 +54,10 @@ do
 	# Récupération du chemin
 	if [[ $Chemin == ${BOOT} ]]
 	then
-		KernelVersions=($(ls -1 ${BOOT}/*gentoo | sed 's/.*-x86_64-//' | sort -V | uniq))
+		KernelVersions=($(ls -1 ${BOOT}/*gentoo* | sed 's/.*-x86_64-//' | sort -V | uniq))
 	elif [[ $Chemin == ${SRC} ]]
 	then
-		KernelVersions=($(ls -1d ${SRC}/*gentoo | sed 's/.*linux-//' | sort -V | uniq))
+		KernelVersions=($(ls -1d ${SRC}/*gentoo* | sed 's/.*linux-//' | sort -V | uniq))
 	else
 		# On ne devrait jamais passer par ici, mais au moins on s'évite quelques problèmes
 		# le jour où on modifie la liste des chemins possibles sans avoir aussi modifié
