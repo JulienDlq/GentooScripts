@@ -15,7 +15,8 @@ pid_tail=0
 while true
 do
 	# Récupération du paquet en cours de compilation
-	compilation_en_cours=$(genlop -c | grep ' \* ' | sed -e 's/ \* //' -e 's/ $//')
+	# (uniq est ajouté pour éviter un bug entre portage et genlop)
+	compilation_en_cours=$(genlop -c | grep ' \* ' | sed -e 's/ \* //' -e 's/ $//' | uniq )
 
 	# Phase d'Attente ou de Démarrage
 	if [[ $compilation_active -eq 0 ]]
