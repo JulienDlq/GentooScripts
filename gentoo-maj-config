@@ -1,4 +1,5 @@
 # Mettre en place quelques variables par défaut
 SETVERBOSE=0
 SETQUIET=1
+FORCE=0
 

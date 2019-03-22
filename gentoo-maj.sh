@@ -14,13 +14,20 @@ cd $SCRIPTPATH
 # VARIABLES
 #----------
 
-MESSAGE_OK="Tout s'est bien passé. ;-)"
-MESSAGE_KO="Il y a eu un soucis... :-S"
-MESSAGE_NA="Il y n'y a pas de mise à jour à faire... :-O"
-MESSAGE_FATAL="Il y a eu une erreur fatale non gérée... x.x"
-JOURNAL_DOSSIER="/var/log/gentooscripts"
-JOURNAL_DATE=$(date +%F-%H%M%S).log
-FORCE=0
+
+declare -A MESSAGE
+MESSAGE=(
+	['OK']="Tout s'est bien passé. ;-)"
+	['KO']="Il y a eu un soucis... :-S"
+	['NA']="Il y n'y a pas de mise à jour à faire... :-O"
+	['FATAL']="Il y a eu une erreur fatale non gérée... x.x"
+)
+
+declare -A JOURNAL
+JOURNAL=(
+	['DOSSIER']="/var/log/gentooscripts"
+	['DATE']=$(date +%F-%H%M%S).log
+)
 
 if [[ $SETVERBOSE -eq 1 ]]
 then
@@ -35,7 +42,86 @@ else
 	QUIET="--quiet-build n"
 fi
 
-mkdir -p $JOURNAL_DOSSIER
+declare -a LISTE_DE_MAJ
+LISTEDEMAJ=(
+	EWU
+	EWUNU
+	EWUNUD
+	EPR
+	EC
+	EPR
+	RR
+	EU
+	ED
+)
+
+declare -A LS
+LS=(
+	['FONCTION']="layman-S"
+	['COMMANDE']="layman $VERBOSE -S"
+)
+declare -A ES
+ES=(
+	['FONCTION']="eix-sync"
+	['COMMANDE']="eix-sync"
+)
+declare -A EDIF
+EDIF=(
+	['FONCTION']="eix-diff"
+	['COMMANDE']="eix-diff | grep -E '\[.*U.*]'"
+)
+declare -A ENVU
+ENVU=(
+	['FONCTION']="env-update"
+	['COMMANDE']="env-update"
+)
+declare -A SEP
+SEP=(
+	['FONCTION']="source-etc-profile"
+	['COMMANDE']="source /etc/profile"
+)
+declare -A EWU
+EWU=(
+	['FONCTION']="emerge-world--update"
+	['COMMANDE']="emerge $VERBOSE $QUIET -u --with-bdeps=y @world"
+)
+declare -A EWUNU
+EWUNU=(
+	['FONCTION']="emerge-world--update-new-use"
+	['COMMANDE']="emerge $VERBOSE $QUIET -Nu --with-bdeps=y @world"
+)
+declare -A EWUNUD
+EWUNUD=(
+	['FONCTION']="emerge-world--update-new-use-deep"
+	['COMMANDE']="emerge $VERBOSE $QUIET -NuD --with-bdeps=y @world"
+)
+declare -A EPR
+EPR=(
+	['FONCTION']="emerge-preserved-rebuild"
+	['COMMANDE']="emerge $VERBOSE $QUIET @preserved-rebuild"
+)
+declare -A EC
+EC=(
+	['FONCTION']="emerge-c"
+	['COMMANDE']="emerge $VERBOSE $QUIET -c"
+)
+declare -A RR
+RR=(
+	['FONCTION']="revdep-rebuild"
+	['COMMANDE']="revdep-rebuild -- $VERBOSE $QUIET"
+)
+declare -A EU
+EU=(
+	['FONCTION']="etc-update"
+	['COMMANDE']="etc-update $VERBOSE"
+)
+declare -A ED
+ED=(
+	['FONCTION']="eclean-distfiles"
+	['COMMANDE']="eclean -v distfiles"
+)
+
+mkdir -p ${JOURNAL['DOSSIER']}
 
 #----------
 # FONCTIONS
@@ -59,7 +145,7 @@ function lancer
 function initialiseJournalScript
 {
 	FONCTION=$1
-	JOURNAL="${JOURNAL_DOSSIER}/$JOURNAL_DATE"
+	JOURNAL="${JOURNAL['DOSSIER']}/${JOURNAL['DATE']}"
 	DATE="$(date +"%F %T")"
 	echo "$DATE ($FONCTION) :: DEBUT"
 	echo "$DATE ($FONCTION) :: DEBUT" >> $JOURNAL
@@ -68,7 +154,7 @@ function initialiseJournalScript
 function finaliseJournalScript
 {
 	FONCTION=$1
-	JOURNAL="${JOURNAL_DOSSIER}/$JOURNAL_DATE"
+	JOURNAL="${JOURNAL['DOSSIER']}/${JOURNAL['DATE']}"
 	DATE="$(date +"%F %T")"
 	echo "$DATE ($FONCTION) :: FIN"
 	echo "$DATE ($FONCTION) :: FIN" >> $JOURNAL
@@ -78,27 +164,27 @@ function messageJournalScript
 {
 	RESULTAT=$1
 	FONCTION=$2
-	JOURNAL="${JOURNAL_DOSSIER}/$JOURNAL_DATE"
+	JOURNAL="${JOURNAL['DOSSIER']}/${JOURNAL['DATE']}"
 	DATE="$(date +"%F %T")"
 	if [[ $RESULTAT -eq 0 ]]
 	then
-		echo "$DATE ($FONCTION) :: $MESSAGE_OK"
-		echo "$DATE ($FONCTION) :: $MESSAGE_OK" >> $JOURNAL
+		echo "$DATE ($FONCTION) :: ${MESSAGE['OK']}"
+		echo "$DATE ($FONCTION) :: ${MESSAGE['OK']}" >> $JOURNAL
 	elif [[ $RESULTAT -eq 1 && $FONCTION != "eix-diff" ]]
 	then
-		echo "$DATE ($FONCTION) :: $MESSAGE_KO"
-		echo "$DATE ($FONCTION) :: $MESSAGE_KO" >> $JOURNAL
+		echo "$DATE ($FONCTION) :: ${MESSAGE['KO']}"
+		echo "$DATE ($FONCTION) :: ${MESSAGE['KO']}" >> $JOURNAL
 		finaliseJournalScript $FONCTION
 		exit 1
 	elif [[ $RESULTAT -eq 1 && $FONCTION == "eix-diff" ]]
 	then
-		echo "$DATE ($FONCTION) :: $MESSAGE_NA"
-		echo "$DATE ($FONCTION) :: $MESSAGE_NA" >> $JOURNAL
+		echo "$DATE ($FONCTION) :: ${MESSAGE['NA']}"
+		echo "$DATE ($FONCTION) :: ${MESSAGE['NA']}" >> $JOURNAL
 		finaliseJournalScript $FONCTION
 		exit 0
 	else
-		echo "$DATE ($FONCTION) :: $MESSAGE_FATAL"
-		echo "$DATE ($FONCTION) :: $MESSAGE_FATAL" >> $JOURNAL
+		echo "$DATE ($FONCTION) :: ${MESSAGE['FATAL']}"
+		echo "$DATE ($FONCTION) :: ${MESSAGE['FATAL']}" >> $JOURNAL
 		finaliseJournalScript $FONCTION
 		exit 2
 	fi
@@ -106,13 +192,8 @@ function messageJournalScript
 
 function rafraichissementEnvironnement
 {
-	FONCTION="env-update"
-	COMMANDE="env-update"
-	lancer $FONCTION "$COMMANDE" false
-
-	FONCTION="source-etc-profile"
-	COMMANDE="source /etc/profile"
-	lancer $FONCTION "$COMMANDE" false
+	lancer ${ENVU['FONCTION']} "${ENVU['COMMANDE']}" false
+	lancer ${SEP['FONCTION']} "${SEP['COMMANDE']}" false
 }
 
 #------------
@@ -121,13 +202,8 @@ function rafraichissementEnvironnement
 
 case $1 in
 -sync)
-	FONCTION="layman-S"
-	COMMANDE="layman $VERBOSE -S"
-	lancer $FONCTION "$COMMANDE" true
-
-	FONCTION="eix-sync"
-	COMMANDE="eix-sync"
-	lancer $FONCTION "$COMMANDE" true
+	lancer ${LS['FONCTION']} "${LS['COMMANDE']}" true
+	lancer ${ES['FONCTION']} "${ES['COMMANDE']}" true
 ;;
 -nosync)
 ;;
@@ -153,47 +229,20 @@ case $2 in
 ;;
 esac
 
+# Lancement des commandes non forcées
 if [[ FORCE -eq 0 ]]
 then
-	FONCTION="eix-diff"
-	COMMANDE="eix-diff | grep -E '\[.*U.*]'"
-	lancer $FONCTION "$COMMANDE" true
+	lancer ${EDIF['FONCTION']} "${EDIF['COMMANDE']}" true
 fi
 
-FONCTION="emerge-world--update"
-COMMANDE="emerge $VERBOSE $QUIET -u --with-bdeps=y @world"
-lancer $FONCTION "$COMMANDE" true
-
-FONCTION="emerge-world--update-new-use)"
-COMMANDE="emerge $VERBOSE $QUIET -Nu --with-bdeps=y @world"
-lancer $FONCTION "$COMMANDE" true
-
-FONCTION="emerge-world--update-new-use-deep)"
-COMMANDE="emerge $VERBOSE $QUIET -NuD --with-bdeps=y @world"
-lancer $FONCTION "$COMMANDE" true
-
-FONCTION="emerge-preserved-rebuild"
-COMMANDE="emerge $VERBOSE $QUIET @preserved-rebuild"
-lancer $FONCTION "$COMMANDE" true
-
-FONCTION="emerge-c"
-COMMANDE="emerge $VERBOSE $QUIET -c"
-lancer $FONCTION "$COMMANDE" true
-
-FONCTION="emerge-preserved-rebuild"
-COMMANDE="emerge $VERBOSE $QUIET @preserved-rebuild"
-lancer $FONCTION "$COMMANDE" true
-
-FONCTION="revdep-rebuild"
-COMMANDE="revdep-rebuild -- $VERBOSE $QUIET"
-lancer $FONCTION "$COMMANDE" true
-
-FONCTION="etc-update"
-COMMANDE="etc-update $VERBOSE"
-lancer $FONCTION "$COMMANDE" true
-
-FONCTION="eclean-distfiles"
-COMMANDE="eclean -v distfiles"
-lancer $FONCTION "$COMMANDE" true
+# Lancement des commandes de mise à jour présente dans la liste
+for i in "${LISTEDEMAJ[@]}"
+do
+	FONCTION_CONSTRUITE=\${$(echo $i)['FONCTION']}
+	COMMANDE_CONSTRUITE=\${$(echo $i)['COMMANDE']}
+	FONCTION=$(eval echo ${FONCTION_CONSTRUITE})
+	COMMANDE=$(eval echo ${COMMANDE_CONSTRUITE})
+	lancer $FONCTION "$COMMANDE" true
+done
 
 exit 0
