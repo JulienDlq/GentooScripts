@@ -34,7 +34,7 @@ konsole -qwindowgeometry ${top_sx}x${top_sy}+${top_px}+${top_py} -e 'top' &
 konsole -qwindowgeometry ${iotop_sx}x${iotop_sy}+${iotop_px}+${iotop_py} -e 'sudo iotop -o' &
 konsole -qwindowgeometry ${ccache_sx}x${ccache_sy}+${ccache_px}+${ccache_py} -e 'watch -n1 "CCACHE_DIR=/var/tmp/ccache/ ccache -s"' &
 konsole -qwindowgeometry ${ccache_root_sx}x${ccache_root_sy}+${ccache_root_px}+${ccache_root_py} -e 'sudo watch -n1 "ccache -s"' &
-konsole -qwindowgeometry ${genlop_sx}x${genlop_sy}+${genlop_px}+${genlop_py} -e 'sudo sh -c "watch -n1 -c genlop -c"' &
+konsole -qwindowgeometry ${genlop_sx}x${genlop_sy}+${genlop_px}+${genlop_py} -e 'sudo watch -n1 -c "genlop -c"' &
 
 exit 0
 
