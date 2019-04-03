@@ -29,12 +29,17 @@ genlop_sy=$(( 200 ))                                          # Reference
 genlop_px=$(( $ccache_root_px + $ccache_root_sx + 25 ))       # Linked to ccache_root window
 genlop_py=$(( $ccache_root_py + 5 * $coef ))                  # Linked to ccache_root window
 
+# Il faut ajouter les lignes suivantes dans le fichier /etc/sudoers afin de ne pas avoir à fournir le mot de passe à sudo
+# %wheel ALL=(ALL) NOPASSWD: /usr/bin/watch -n1 -- ccache -s
+# %wheel ALL=(ALL) NOPASSWD: /usr/bin/iotop -o
+# %wheel ALL=(ALL) NOPASSWD: /usr/bin/watch -n1 -c -- genlop -c
+
 # Commandes
 konsole -qwindowgeometry ${top_sx}x${top_sy}+${top_px}+${top_py} -e 'top' &
 konsole -qwindowgeometry ${iotop_sx}x${iotop_sy}+${iotop_px}+${iotop_py} -e 'sudo iotop -o' &
-konsole -qwindowgeometry ${ccache_sx}x${ccache_sy}+${ccache_px}+${ccache_py} -e 'watch -n1 "CCACHE_DIR=/var/tmp/ccache/ ccache -s"' &
-konsole -qwindowgeometry ${ccache_root_sx}x${ccache_root_sy}+${ccache_root_px}+${ccache_root_py} -e 'sudo watch -n1 "ccache -s"' &
-konsole -qwindowgeometry ${genlop_sx}x${genlop_sy}+${genlop_px}+${genlop_py} -e 'sudo watch -n1 -c "genlop -c"' &
+konsole -qwindowgeometry ${ccache_sx}x${ccache_sy}+${ccache_px}+${ccache_py} -e 'watch -n1 -- CCACHE_DIR=/var/tmp/ccache/ ccache -s' &
+konsole -qwindowgeometry ${ccache_root_sx}x${ccache_root_sy}+${ccache_root_px}+${ccache_root_py} -e 'sudo watch -n1 -- ccache -s' &
+konsole -qwindowgeometry ${genlop_sx}x${genlop_sy}+${genlop_px}+${genlop_py} -e 'sudo watch -n1 -c -- genlop -c' &
 
 exit 0
 
