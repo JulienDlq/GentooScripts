@@ -34,6 +34,11 @@ sensors_sy=$(( 290 ))                                         # Reference
 sensors_px=$(( $ccache_px + $ccache_sx + 25 ))                # Linked to ccache window
 sensors_py=$(( $ccache_py ))                                  # Linked to ccache window
 
+df_sx=$(( 540 ))                                              # Reference
+df_sy=$(( 130 ))                                              # Reference
+df_px=$(( $sensors_px ))                                      # Linked to sensors window
+df_py=$(( $sensors_py + $sensors_sy + 50 ))                   # Linked to sensors window
+
 # Il faut ajouter les lignes suivantes dans le fichier /etc/sudoers afin de ne pas avoir à fournir le mot de passe à sudo
 # %wheel ALL=(ALL) NOPASSWD: /usr/bin/watch -n1 -- ccache -s
 # %wheel ALL=(ALL) NOPASSWD: /usr/bin/iotop -o
@@ -46,6 +51,7 @@ konsole -qwindowgeometry ${ccache_sx}x${ccache_sy}+${ccache_px}+${ccache_py} -e 
 konsole -qwindowgeometry ${ccache_root_sx}x${ccache_root_sy}+${ccache_root_px}+${ccache_root_py} -e 'sudo watch -n1 -- ccache -s' &
 konsole -qwindowgeometry ${genlop_sx}x${genlop_sy}+${genlop_px}+${genlop_py} -e 'sudo watch -n1 -c -- genlop -c' &
 konsole -qwindowgeometry ${sensors_sx}x${sensors_sy}+${sensors_px}+${sensors_py} -e 'watch -n1 -c -- sensors' &
+konsole -qwindowgeometry ${df_sx}x${df_sy}+${df_px}+${df_py} -e 'watch -n1 -- "df -h | grep portage ; echo ; df | grep portage"' &
 
 exit 0
 
