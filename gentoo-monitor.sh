@@ -15,7 +15,7 @@ iotop_sx=$(( $top_sx ))                                       # Linked to top wi
 iotop_sy=$(( 99 * $coef - $iotop_py ))                        # Reference
 
 ccache_sx=$(( 480 ))                                          # Reference
-ccache_sy=$(( 485 ))                                          # Reference
+ccache_sy=$(( 515 ))                                          # Reference
 ccache_px=$(( $top_px + $top_sx + 25 ))                       # Linked to top window
 ccache_py=$(( $top_py ))                                      # Linked to top window
 
