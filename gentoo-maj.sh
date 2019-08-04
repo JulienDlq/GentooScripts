@@ -44,6 +44,10 @@ fi
 
 declare -a LISTE_DE_MAJ
 LISTEDEMAJ=(
+	ESU
+	ESUNU
+	ESUNUD
+  EPR
 	EWU
 	EWUNU
 	EWUNUD
@@ -79,6 +83,21 @@ declare -A SEP
 SEP=(
 	['FONCTION']="source-etc-profile"
 	['COMMANDE']="source /etc/profile"
+)
+declare -A ESU
+ESU=(
+	['FONCTION']="emerge-system--update"
+	['COMMANDE']="emerge $VERBOSE $QUIET -u --with-bdeps=y @system"
+)
+declare -A ESUNU
+ESUNU=(
+	['FONCTION']="emerge-system--update-new-use"
+	['COMMANDE']="emerge $VERBOSE $QUIET -Nu --with-bdeps=y @system"
+)
+declare -A ESUNUD
+ESUNUD=(
+	['FONCTION']="emerge-system--update-new-use-deep"
+	['COMMANDE']="emerge $VERBOSE $QUIET -NuD --with-bdeps=y @system"
 )
 declare -A EWU
 EWU=(
