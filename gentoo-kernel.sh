@@ -47,7 +47,7 @@ elif [[ $result -eq 0 ]]
 then
 	echo "La partition "${BOOT}" est déjà montée."
 else
-	echo "Erreur non gérée (Montage "${BOOT}")"
+	echo "Erreur non gérée (Montage "${BOOT}")."
 	exit 1
 fi
 echo
@@ -107,7 +107,7 @@ echo 'Récupération de la configuration du noyau actuel'
 cp -v /usr/src/linux-$(uname -r)/.config /usr/src/linux/.config
 echo
 
-echo 'Lancement de la construction'
+echo 'Lancement de la construction du noyau.'
 genkernel all
 echo
 
@@ -119,7 +119,7 @@ then
 	emerge $VERBOSE $QUIET --with-bdeps=y @module-rebuild
 fi
 
-echo "Il ne reste plus qu'à reconfigurer le grub"
+echo "Il ne reste plus qu'à reconfigurer le grub."
 echo
 
 exit 0
