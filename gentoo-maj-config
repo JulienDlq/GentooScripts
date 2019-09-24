@@ -1,5 +1,11 @@
 # Mettre en place quelques variables par défaut
+
+# Pas de verbose
 SETVERBOSE=0
+
+# Pas de message de compilation sur la sortie standard
 SETQUIET=1
+
+# On ne force pas la mise à jour s'il n'y a rien de nouveau à mettre à jour
 FORCE=0
 
