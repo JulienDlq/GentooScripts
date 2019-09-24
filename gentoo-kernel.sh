@@ -13,6 +13,20 @@ cd $SCRIPTPATH
 BOOT=/boot
 SRC=/usr/src
 
+if [[ $SETVERBOSE -eq 1 ]]
+then
+	VERBOSE="--verbose"
+else
+	VERBOSE=""
+fi
+if [[ $SETQUIET -eq 1 ]]
+then
+	QUIET="--quiet-build y"
+else
+	QUIET="--quiet-build n"
+fi
+
+
 # Fonctions
 function noyau_gt() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"; }
 function noyau_le() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" == "$1"; }
@@ -96,6 +110,14 @@ echo
 echo 'Lancement de la construction'
 genkernel all
 echo
+
+# Dans le cas où il y a des modules noyau à reconstruire
+# Il faut lancer la reconstruction
+if [[ $MODULEREBUILD -eq 1 ]]
+then
+	echo 'Lancement de la reconstruction des modules.'
+	emerge $VERBOSE $QUIET --with-bdeps=y @module-rebuild
+fi
 
 echo "Il ne reste plus qu'à reconfigurer le grub"
 echo

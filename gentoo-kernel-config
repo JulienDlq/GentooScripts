@@ -1,0 +1,11 @@
+# Mettre en place quelques variables par défaut
+
+# Pas de verbose
+SETVERBOSE=0
+
+# Pas de message de compilation sur la sortie standard
+SETQUIET=1
+
+# Reconstruction des modules (désactivée par défaut)
+MODULEREBUILD=0
+
