@@ -1,0 +1,5 @@
+# Mettre en place quelques variables par défaut
+
+# Configuration du script
+NBMAXKERNEL=2
+

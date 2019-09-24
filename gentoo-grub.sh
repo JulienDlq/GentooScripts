@@ -7,8 +7,15 @@ cd $SCRIPTPATH
 # Initialisation du script
 . ./init
 
-# Configuration du script
-NBMAXKERNEL=2
+# Chargement de la configuration du script
+. ./gentoo-grub-config
+
+# Valeur par défaut pour le nombre maximum de noyau à conserver
+if [[ -z "$NBMAXKERNEL" ]]
+then
+	echo "NBMAXKERNEL non configuré, valeur par défaut 2."
+	NBMAXKERNEL=2
+fi
 
 # Variables globales
 BOOT=/boot
