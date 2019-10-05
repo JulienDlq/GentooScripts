@@ -8,6 +8,7 @@ cd $SCRIPTPATH
 . ./init
 
 # Configuration du script
+. ./gentoo-kernel-config
 
 # Variables globales
 BOOT=/boot
