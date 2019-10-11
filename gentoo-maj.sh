@@ -69,11 +69,6 @@ ES=(
 	['FONCTION']="eix-sync"
 	['COMMANDE']="eix-sync"
 )
-declare -A EDIF
-EDIF=(
-	['FONCTION']="eix-diff"
-	['COMMANDE']="eix-diff | grep -E '\[.*U.*]'"
-)
 declare -A ENVU
 ENVU=(
 	['FONCTION']="env-update"
@@ -220,6 +215,11 @@ function rafraichissementEnvironnement
 #------------
 
 case $1 in
+-synconly)
+	lancer ${LS['FONCTION']} "${LS['COMMANDE']}" true
+	lancer ${ES['FONCTION']} "${ES['COMMANDE']}" true
+	exit 0
+;;
 -sync)
 	lancer ${LS['FONCTION']} "${LS['COMMANDE']}" true
 	lancer ${ES['FONCTION']} "${ES['COMMANDE']}" true
@@ -228,31 +228,13 @@ case $1 in
 ;;
 *|"")
 	echo "Utilisation : ./$(basename $0) <-sync|-nosync> [-force]"
-	echo "-sync : synchronise l'arbre portage et la recherche eix avant la mise à jour."
-	echo "-nosync : lance la mise à jour sans synchroniser l'arbre portage et la recherche eix."
-	echo "-force : force la mise à jour même s'il n'y a pas d'update dans eix-diff"
+	echo "-sync     : synchronise l'arbre portage et la recherche eix avant la mise à jour."
+	echo "-synconly : synchronise l'arbre portage et la recherche eix sans mettre à jour."
+	echo "-nosync   : lance la mise à jour sans synchroniser l'arbre portage et la recherche eix."
 	exit 0
 ;;
 esac
 
-case $2 in
--force)
-	FONCTION="force"
-	initialiseJournalScript $FONCTION
-	FORCE=1
-	RESULTAT=$?
-    messageJournalScript $RESULTAT $FONCTION
-    finaliseJournalScript $FONCTION
-;;
-*|"")
-;;
-esac
-
-# Lancement des commandes non forcées
-if [[ FORCE -eq 0 ]]
-then
-	lancer ${EDIF['FONCTION']} "${EDIF['COMMANDE']}" true
-fi
 
 # Lancement des commandes de mise à jour présente dans la liste
 for i in "${LISTEDEMAJ[@]}"
