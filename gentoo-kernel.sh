@@ -41,10 +41,20 @@ case $1 in
 		MENUCONFIG="--no-menuconfig"
 		;;
 	*|"")
-		echo "Utilisation : ./$(basename $0) <-menuconfig|-no-menuconfig>"
+		echo "Utilisation : ./$(basename $0) <-menuconfig|-no-menuconfig> [-force]"
 		echo "-menuconfig    : lance menuconfig avant la compilation du noyau."
 		echo "-no-menuconfig : ne lance pas menuconfig avant la compilation du noyau."
+		echo "-force         : force la reconstruction du noyau."
 		exit 0
+		;;
+esac
+
+case $2 in
+	-force)
+		FORCE=1
+		;;
+	*|"")
+		FORCE=0
 		;;
 esac
 
@@ -53,6 +63,18 @@ function noyau_gt() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" !=
 function noyau_le() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" == "$1"; }
 function noyau_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
 function noyau_ge() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"; }
+
+function forcer()
+{
+	if [[ $FORCE -eq 0 ]]
+	then
+		echo
+		exit 0
+	else
+		echo "Mais la reconstruction est forcée."
+		echo
+	fi
+}
 
 # Monter la partition
 
@@ -113,12 +135,10 @@ then
 elif noyau_lt $noyau_a_construire $noyau_installe_dernier
 then
 	echo "Le dernier noyau installé est en avance sur le noyau à construire."
-	echo
-	exit 0
+	forcer
 else
 	echo "Le noyau à construire est déjà installé."
-	echo
-	exit 0
+	forcer
 fi
 
 # Dans le cas où il faut construire

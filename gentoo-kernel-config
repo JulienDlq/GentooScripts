@@ -6,6 +6,9 @@ SETVERBOSE=0
 # Pas de message de compilation sur la sortie standard
 SETQUIET=1
 
+# La reconstruction n'est pas forcée
+FORCE=0
+
 # Pas de menuconfig
 SETMENUCONFIG=0
 
