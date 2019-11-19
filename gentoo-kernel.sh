@@ -98,7 +98,7 @@ echo
 # Récupération des informations pour la prise de décision
 noyau_actuel=$(echo linux-$(uname -r) | sed 's/linux-//')
 noyau_a_construire=$(ls -l /usr/src/linux | tr -s ' ' | cut -d' ' -f11 | sed 's/linux-//')
-noyau_installe_dernier=$(ls -l /boot | tr -s ' ' | cut -d' ' -f9 | grep '^kernel-' | sed 's/kernel-genkernel-x86_64-//' | tail -n1)
+noyau_installe_dernier=$(ls -lrt /boot | tr -s ' ' | cut -d' ' -f9 | grep '^kernel-' | sed 's/kernel-genkernel-x86_64-//' | tail -n1)
 
 echo -n 'Noyau actuel             :' $noyau_actuel
 echo
