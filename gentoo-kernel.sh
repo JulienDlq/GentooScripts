@@ -33,6 +33,20 @@ else
 	MENUCONFIG="--no-menuconfig"
 fi
 
+case $1 in
+	-menuconfig)
+		MENUCONFIG="--menuconfig"
+		;;
+	-no-menuconfig)
+		MENUCONFIG="--no-menuconfig"
+		;;
+	*|"")
+		echo "Utilisation : ./$(basename $0) <-menuconfig|-no-menuconfig>"
+		echo "-menuconfig    : lance menuconfig avant la compilation du noyau."
+		echo "-no-menuconfig : ne lance pas menuconfig avant la compilation du noyau."
+		exit 0
+		;;
+esac
 
 # Fonctions
 function noyau_gt() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"; }
