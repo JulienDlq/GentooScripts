@@ -227,7 +227,7 @@ case $1 in
 -nosync)
 ;;
 *|"")
-	echo "Utilisation : ./$(basename $0) <-sync|-nosync> [-force]"
+	echo "Utilisation : ./$(basename $0) <-sync|-nosync>"
 	echo "-sync     : synchronise l'arbre portage et la recherche eix avant la mise à jour."
 	echo "-synconly : synchronise l'arbre portage et la recherche eix sans mettre à jour."
 	echo "-nosync   : lance la mise à jour sans synchroniser l'arbre portage et la recherche eix."
