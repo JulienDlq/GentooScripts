@@ -26,6 +26,12 @@ then
 else
 	QUIET="--quiet-build n"
 fi
+if [[ $SETMENUCONFIG -eq 1 ]]
+then
+	MENUCONFIG="--menuconfig"
+else
+	MENUCONFIG="--no-menuconfig"
+fi
 
 
 # Fonctions
@@ -109,7 +115,7 @@ cp -v /usr/src/linux-$(uname -r)/.config /usr/src/linux/.config
 echo
 
 echo 'Lancement de la construction du noyau.'
-genkernel all
+genkernel $MENUCONFIG all
 echo
 
 # Dans le cas où il y a des modules noyau à reconstruire
