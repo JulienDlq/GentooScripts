@@ -69,6 +69,11 @@ ES=(
 	['FONCTION']="PORTAGE::SYNC"
 	['COMMANDE']="eix-sync"
 )
+declare -A EUC
+EUC=(
+	  ['FONCTION']="PORTAGE::LIST::UPDATE"
+	  ['COMMANDE']="eix -u -c"
+)
 declare -A ENVU
 ENVU=(
 	['FONCTION']="SYSTEM::UPDATE::ENV"
@@ -162,7 +167,6 @@ function initialiseJournalScript
 	JOURNAL="${JOURNAL['DOSSIER']}/${JOURNAL['DATE']}"
 	DATE="$(date +"%F %T")"
   echo
-  echo
 	echo "$FONCTION"
   echo
 	echo "$DATE ($FONCTION) :: DEBUT" >> $JOURNAL
@@ -173,6 +177,7 @@ function finaliseJournalScript
 	FONCTION=$1
 	JOURNAL="${JOURNAL['DOSSIER']}/${JOURNAL['DATE']}"
 	DATE="$(date +"%F %T")"
+  echo
 	echo "$DATE ($FONCTION) :: FIN" >> $JOURNAL
 }
 
@@ -214,22 +219,27 @@ function rafraichissementEnvironnement
 #------------
 
 case $1 in
+-sync)
+	lancer ${LS['FONCTION']} "${LS['COMMANDE']}" true
+	lancer ${ES['FONCTION']} "${ES['COMMANDE']}" true
+;;
 -synconly)
 	lancer ${LS['FONCTION']} "${LS['COMMANDE']}" true
 	lancer ${ES['FONCTION']} "${ES['COMMANDE']}" true
 	exit 0
 ;;
--sync)
-	lancer ${LS['FONCTION']} "${LS['COMMANDE']}" true
-	lancer ${ES['FONCTION']} "${ES['COMMANDE']}" true
-;;
 -nosync)
+;;
+-listupdate)
+	lancer ${EUC['FONCTION']} "${EUC['COMMANDE']}" false
+	exit 0
 ;;
 *|"")
 	echo "Utilisation : ./$(basename $0) <-sync|-nosync>"
-	echo "-sync     : synchronise l'arbre portage et la recherche eix avant la mise à jour."
-	echo "-synconly : synchronise l'arbre portage et la recherche eix sans mettre à jour."
-	echo "-nosync   : lance la mise à jour sans synchroniser l'arbre portage et la recherche eix."
+	echo "-sync         : synchronise l'arbre portage et la recherche eix avant la mise à jour."
+	echo "-synconly     : synchronise l'arbre portage et la recherche eix sans mettre à jour."
+	echo "-nosync       : lance la mise à jour sans synchroniser l'arbre portage et la recherche eix."
+	echo "-listupdate   : lister les mises à jour disponibles."
 	exit 0
 ;;
 esac
