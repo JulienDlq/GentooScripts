@@ -74,6 +74,11 @@ EUC=(
 	  ['FONCTION']="PORTAGE::LIST::UPDATE"
 	  ['COMMANDE']="eix -u -c"
 )
+declare -A EIC
+EIC=(
+	  ['FONCTION']="PORTAGE::LIST::INSTALLED"
+	  ['COMMANDE']="EIX_LIMIT_COMPACT=0 eix -I -c"
+)
 declare -A ENVU
 ENVU=(
 	['FONCTION']="SYSTEM::UPDATE::ENV"
@@ -231,15 +236,20 @@ case $1 in
 -nosync)
 ;;
 -listupdate)
-	lancer ${EUC['FONCTION']} "${EUC['COMMANDE']}" false
+  lancer ${EUC['FONCTION']} "${EUC['COMMANDE']}" false
+  exit 0
+;;
+-listinstalled)
+	lancer ${EIC['FONCTION']} "${EIC['COMMANDE']}" false
 	exit 0
 ;;
 *|"")
 	echo "Utilisation : ./$(basename $0) <-sync|-nosync>"
-	echo "-sync         : synchronise l'arbre portage et la recherche eix avant la mise à jour."
-	echo "-synconly     : synchronise l'arbre portage et la recherche eix sans mettre à jour."
-	echo "-nosync       : lance la mise à jour sans synchroniser l'arbre portage et la recherche eix."
-	echo "-listupdate   : lister les mises à jour disponibles."
+	echo "-sync          : synchronise l'arbre portage et la recherche eix avant la mise à jour."
+	echo "-synconly      : synchronise l'arbre portage et la recherche eix sans mettre à jour."
+	echo "-nosync        : lance la mise à jour sans synchroniser l'arbre portage et la recherche eix."
+	echo "-listupdate    : lister les mises à jour disponibles."
+	echo "-listinstalled : lister les paquets installés."
 	exit 0
 ;;
 esac
