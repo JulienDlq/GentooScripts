@@ -184,18 +184,12 @@ function messageJournalScript
 	then
 		echo "$DATE ($FONCTION) :: ${MESSAGE['OK']}"
 		echo "$DATE ($FONCTION) :: ${MESSAGE['OK']}" >> $JOURNAL
-	elif [[ $RESULTAT -eq 1 && $FONCTION != "eix-diff" ]]
+	elif [[ $RESULTAT -eq 1 ]]
 	then
 		echo "$DATE ($FONCTION) :: ${MESSAGE['KO']}"
 		echo "$DATE ($FONCTION) :: ${MESSAGE['KO']}" >> $JOURNAL
 		finaliseJournalScript $FONCTION
 		exit 1
-	elif [[ $RESULTAT -eq 1 && $FONCTION == "eix-diff" ]]
-	then
-		echo "$DATE ($FONCTION) :: ${MESSAGE['NA']}"
-		echo "$DATE ($FONCTION) :: ${MESSAGE['NA']}" >> $JOURNAL
-		finaliseJournalScript $FONCTION
-		exit 0
 	else
 		echo "$DATE ($FONCTION) :: ${MESSAGE['FATAL']}"
 		echo "$DATE ($FONCTION) :: ${MESSAGE['FATAL']}" >> $JOURNAL
