@@ -61,77 +61,77 @@ LISTEDEMAJ=(
 
 declare -A LS
 LS=(
-	['FONCTION']="layman-S"
+	['FONCTION']="LAYMAN::SYNC"
 	['COMMANDE']="layman $VERBOSE -S"
 )
 declare -A ES
 ES=(
-	['FONCTION']="eix-sync"
+	['FONCTION']="PORTAGE::SYNC"
 	['COMMANDE']="eix-sync"
 )
 declare -A ENVU
 ENVU=(
-	['FONCTION']="env-update"
+	['FONCTION']="SYSTEM::UPDATE::ENV"
 	['COMMANDE']="env-update"
 )
 declare -A SEP
 SEP=(
-	['FONCTION']="source-etc-profile"
+	['FONCTION']="SYSTEM::UPDATE::PROFILE"
 	['COMMANDE']="source /etc/profile"
 )
 declare -A ESU
 ESU=(
-	['FONCTION']="emerge-system--update"
+	['FONCTION']="PORTAGE::EMERGE::SYSTEM ( update )"
 	['COMMANDE']="emerge $VERBOSE $QUIET -u --with-bdeps=y @system"
 )
 declare -A ESUNU
 ESUNU=(
-	['FONCTION']="emerge-system--update-new-use"
+	['FONCTION']="PORTAGE::EMERGE::SYSTEM ( update ; new use )"
 	['COMMANDE']="emerge $VERBOSE $QUIET -Nu --with-bdeps=y @system"
 )
 declare -A ESUNUD
 ESUNUD=(
-	['FONCTION']="emerge-system--update-new-use-deep"
+	['FONCTION']="PORTAGE::EMERGE::SYSTEM ( update ; new use ; deep )"
 	['COMMANDE']="emerge $VERBOSE $QUIET -NuD --with-bdeps=y @system"
 )
 declare -A EWU
 EWU=(
-	['FONCTION']="emerge-world--update"
+	['FONCTION']="PORTAGE::EMERGE::WORLD ( update )"
 	['COMMANDE']="emerge $VERBOSE $QUIET -u --with-bdeps=y @world"
 )
 declare -A EWUNU
 EWUNU=(
-	['FONCTION']="emerge-world--update-new-use"
+	['FONCTION']="PORTAGE::EMERGE::WORLD ( update ; new use )"
 	['COMMANDE']="emerge $VERBOSE $QUIET -Nu --with-bdeps=y @world"
 )
 declare -A EWUNUD
 EWUNUD=(
-	['FONCTION']="emerge-world--update-new-use-deep"
+	['FONCTION']="PORTAGE::EMERGE::WORLD ( update ; new use ; deep )"
 	['COMMANDE']="emerge $VERBOSE $QUIET -NuD --with-bdeps=y @world"
 )
 declare -A EPR
 EPR=(
-	['FONCTION']="emerge-preserved-rebuild"
+	['FONCTION']="PORTAGE::EMERGE::PRESERVEDREBUILD"
 	['COMMANDE']="emerge $VERBOSE $QUIET @preserved-rebuild"
 )
 declare -A EC
 EC=(
-	['FONCTION']="emerge-c"
+	['FONCTION']="PORTAGE::EMERGE::REMOVE::OBSOLETES"
 	['COMMANDE']="emerge $VERBOSE $QUIET -c"
 )
 declare -A RR
 RR=(
-	['FONCTION']="revdep-rebuild"
+	['FONCTION']="PORTAGE::REBUILD::DEPENDENCIES"
 	['COMMANDE']="revdep-rebuild -- $VERBOSE $QUIET"
 )
 declare -A EU
 EU=(
-	['FONCTION']="etc-update"
+	['FONCTION']="PORTAGE::UPDATE::ETC"
 	['COMMANDE']="etc-update $VERBOSE"
 )
 declare -A ED
 ED=(
-	['FONCTION']="eclean-distfiles"
+	['FONCTION']="PORTAGE::CLEAN::DISTFILES"
 	['COMMANDE']="eclean -v distfiles"
 )
 
@@ -145,11 +145,11 @@ function lancer
 	FONCTION=$1
 	COMMANDE=$2
 	RAFRAICHIR=$3
-	initialiseJournalScript $FONCTION
+	initialiseJournalScript "$FONCTION"
 	eval $COMMANDE
 	RESULTAT=$?
-	messageJournalScript $RESULTAT $FONCTION
-	finaliseJournalScript $FONCTION
+	messageJournalScript $RESULTAT "$FONCTION"
+	finaliseJournalScript "$FONCTION"
 	if eval $RAFRAICHIR
 	then
 		rafraichissementEnvironnement
@@ -161,7 +161,10 @@ function initialiseJournalScript
 	FONCTION=$1
 	JOURNAL="${JOURNAL['DOSSIER']}/${JOURNAL['DATE']}"
 	DATE="$(date +"%F %T")"
-	echo "$DATE ($FONCTION) :: DEBUT"
+  echo
+  echo
+	echo "$FONCTION"
+  echo
 	echo "$DATE ($FONCTION) :: DEBUT" >> $JOURNAL
 }
 
@@ -170,7 +173,6 @@ function finaliseJournalScript
 	FONCTION=$1
 	JOURNAL="${JOURNAL['DOSSIER']}/${JOURNAL['DATE']}"
 	DATE="$(date +"%F %T")"
-	echo "$DATE ($FONCTION) :: FIN"
 	echo "$DATE ($FONCTION) :: FIN" >> $JOURNAL
 }
 
@@ -182,18 +184,21 @@ function messageJournalScript
 	DATE="$(date +"%F %T")"
 	if [[ $RESULTAT -eq 0 ]]
 	then
-		echo "$DATE ($FONCTION) :: ${MESSAGE['OK']}"
 		echo "$DATE ($FONCTION) :: ${MESSAGE['OK']}" >> $JOURNAL
 	elif [[ $RESULTAT -eq 1 ]]
 	then
-		echo "$DATE ($FONCTION) :: ${MESSAGE['KO']}"
+    echo
+		echo "$FONCTION :: ${MESSAGE['KO']}"
+    echo
 		echo "$DATE ($FONCTION) :: ${MESSAGE['KO']}" >> $JOURNAL
-		finaliseJournalScript $FONCTION
+		finaliseJournalScript "$FONCTION"
 		exit 1
 	else
-		echo "$DATE ($FONCTION) :: ${MESSAGE['FATAL']}"
+    echo
+		echo "$FONCTION :: ${MESSAGE['FATAL']}"
+    echo
 		echo "$DATE ($FONCTION) :: ${MESSAGE['FATAL']}" >> $JOURNAL
-		finaliseJournalScript $FONCTION
+		finaliseJournalScript "$FONCTION"
 		exit 2
 	fi
 }
@@ -237,7 +242,7 @@ do
 	COMMANDE_CONSTRUITE=\${$(echo $i)['COMMANDE']}
 	FONCTION=$(eval echo ${FONCTION_CONSTRUITE})
 	COMMANDE=$(eval echo ${COMMANDE_CONSTRUITE})
-	lancer $FONCTION "$COMMANDE" true
+	lancer "$FONCTION" "$COMMANDE" true
 done
 
 exit 0
