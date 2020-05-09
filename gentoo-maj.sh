@@ -245,4 +245,7 @@ do
 	lancer "$FONCTION" "$COMMANDE" true
 done
 
+echo
+echo
+
 exit 0
