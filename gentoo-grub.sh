@@ -10,6 +10,9 @@ cd $SCRIPTPATH
 # Chargement de la configuration du script
 . ./gentoo-grub-config
 
+# Toute la suite va nécessiter des droits d'admin
+verificationAdmin
+
 # Valeur par défaut pour le nombre maximum de noyau à conserver
 if [[ -z "$NBMAXKERNEL" ]]
 then

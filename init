@@ -1,6 +1,9 @@
 # Forcer les scripts à être lancé en root seulement
-if [ "$(id -u)" != "0" ]; then
-	echo "Utiliser sudo pour lancer le script $SCRIPTNAME" 1>&2
-	exit 1
-fi
+function verificationAdmin
+{
+  if [ "$(id -u)" != "0" ]; then
+  	echo "Utiliser sudo pour lancer le script $SCRIPTNAME" 1>&2
+  	exit 1
+  fi
+}
 

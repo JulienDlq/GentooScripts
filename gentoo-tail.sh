@@ -7,6 +7,9 @@ cd $SCRIPTPATH
 # Initialisation du script
 . ./init
 
+# Toute la suite va nécessiter des droits d'admin
+verificationAdmin
+
 # Variables
 compilation_active=0
 compilation_en_cours=''

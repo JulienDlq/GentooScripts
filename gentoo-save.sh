@@ -10,6 +10,9 @@ cd $SCRIPTPATH
 # Chargement de la configuration du script
 . ./gentoo-save-config
 
+# Toute la suite va nécessiter des droits d'admin
+verificationAdmin
+
 # Si la sauvegarde est samba et que la configuration correspondante est paramétrée, alors on configure le partage
 if [[ "$type" == "samba" && "$serveur" != "" && "$dossier" != "" ]]
 then

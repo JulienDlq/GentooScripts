@@ -10,6 +10,9 @@ cd $SCRIPTPATH
 # Configuration du script
 . ./gentoo-kernel-config
 
+# Toute la suite va nécessiter des droits d'admin
+verificationAdmin
+
 # Variables globales
 BOOT=/boot
 SRC=/usr/src

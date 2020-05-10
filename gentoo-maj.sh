@@ -229,15 +229,21 @@ function rafraichissementEnvironnement
 
 case $1 in
 -sync)
+  # Toute la suite va nécessiter des droits d'admin
+  verificationAdmin
 	lancer ${LS['FONCTION']} "${LS['COMMANDE']}" true
 	lancer ${ES['FONCTION']} "${ES['COMMANDE']}" true
 ;;
 -synconly)
+  # Toute la suite va nécessiter des droits d'admin
+  verificationAdmin
 	lancer ${LS['FONCTION']} "${LS['COMMANDE']}" true
 	lancer ${ES['FONCTION']} "${ES['COMMANDE']}" true
 	exit 0
 ;;
 -nosync)
+  # Toute la suite va nécessiter des droits d'admin
+  verificationAdmin
 ;;
 -listupdate)
   lancer ${EUC['FONCTION']} "${EUC['COMMANDE']}" false
@@ -257,7 +263,6 @@ case $1 in
 	exit 0
 ;;
 esac
-
 
 # Lancement des commandes de mise à jour présente dans la liste
 for i in "${LISTEDEMAJ[@]}"
