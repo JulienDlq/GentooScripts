@@ -195,7 +195,11 @@ function messageJournalScript
 	if [[ $RESULTAT -eq 0 ]]
 	then
 		echo "$DATE ($FONCTION) :: ${MESSAGE['OK']}" >> $JOURNAL
-	elif [[ $RESULTAT -eq 1 ]]
+	elif [[ $RESULTAT -eq 1 && $FONCTION == ${EUC['FONCTION']} ]]
+	then
+		echo "$DATE ($FONCTION) :: ${MESSAGE['OK']}" >> $JOURNAL
+	  finaliseJournalScript "$FONCTION"
+	elif [[ $RESULTAT -eq 1 && $FONCTION != ${EUC['FONCTION']} ]]
 	then
     echo
 		echo "$FONCTION :: ${MESSAGE['KO']}"
