@@ -43,11 +43,15 @@ case $1 in
 	-no-menuconfig)
 		MENUCONFIG="--no-menuconfig"
 		;;
+	-initramfs-update)
+		INITRAMFSUPDATE=1
+		;;
 	*|"")
-		echo "Utilisation : ./$(basename $0) <-menuconfig|-no-menuconfig> [-force]"
-		echo "-menuconfig    : lance menuconfig avant la compilation du noyau."
-		echo "-no-menuconfig : ne lance pas menuconfig avant la compilation du noyau."
-		echo "-force         : force la reconstruction du noyau."
+		echo "Utilisation : ./$(basename $0) <-menuconfig|-no-menuconfig|-initramfs> [-force]"
+		echo "-menuconfig       : lance menuconfig avant la compilation du noyau."
+		echo "-no-menuconfig    : ne lance pas menuconfig avant la compilation du noyau."
+		echo "-initramfs-update : mettre à jour le fichier initramfs du kernel."
+		echo "-force            : force la reconstruction du noyau."
 		exit 0
 		;;
 esac
@@ -131,36 +135,52 @@ fi
 echo
 
 # Prise de décision
-if  noyau_gt $noyau_a_construire $noyau_installe_dernier
+if [[ $INITRAMFSUPDATE -eq 1 ]]
 then
-	echo "Le noyau à construire n'est pas encore installé."
+	echo "Le fichier initramfs doit être mis-à-jour."
 	echo
-elif noyau_lt $noyau_a_construire $noyau_installe_dernier
-then
-	echo "Le dernier noyau installé est en avance sur le noyau à construire."
-	forcer
 else
-	echo "Le noyau à construire est déjà installé."
-	forcer
+	if noyau_gt $noyau_a_construire $noyau_installe_dernier
+	then
+		echo "Le noyau à construire n'est pas encore installé."
+		echo
+	elif noyau_lt $noyau_a_construire $noyau_installe_dernier
+	then
+		echo "Le dernier noyau installé est en avance sur le noyau à construire."
+		forcer
+	else
+		echo "Le noyau à construire est déjà installé."
+		forcer
+	fi
 fi
 
-# Dans le cas où il faut construire
-# Il faut récupérer la configuration du noyau actuel
-# et la rendre disponible pour le nouveau noyau
-echo 'Récupération de la configuration du noyau actuel'
-cp -v /usr/src/linux-$(uname -r)/.config /usr/src/linux/.config
-echo
 
-echo 'Lancement de la construction du noyau.'
-genkernel $MENUCONFIG all
-echo
-
-# Dans le cas où il y a des modules noyau à reconstruire
-# Il faut lancer la reconstruction
-if [[ $MODULEREBUILD -eq 1 ]]
+if [[ $INITRAMFSUPDATE -eq 1 ]]
 then
-	echo 'Lancement de la reconstruction des modules.'
-	emerge $VERBOSE $QUIET --with-bdeps=y @module-rebuild
+	# Dans le cas où il faut mettre à jour le fichier initramfs
+	# Il n'y a qu'à lancer la commande de mise-à-jour, rien de plus
+	echo 'Lancement de la mise-à-jour du fichier initramfs.'
+	genkernel initramfs
+	echo
+else
+	# Dans le cas où il faut construire
+	# Il faut récupérer la configuration du noyau actuel
+	# et la rendre disponible pour le nouveau noyau
+	echo 'Récupération de la configuration du noyau actuel'
+	cp -v /usr/src/linux-$(uname -r)/.config /usr/src/linux/.config
+	echo
+
+	echo 'Lancement de la construction du noyau.'
+	genkernel $MENUCONFIG all
+	echo
+
+	# Dans le cas où il y a des modules noyau à reconstruire
+	# Il faut lancer la reconstruction
+	if [[ $MODULEREBUILD -eq 1 ]]
+	then
+		echo 'Lancement de la reconstruction des modules.'
+		emerge $VERBOSE $QUIET --with-bdeps=y @module-rebuild
+	fi
 fi
 
 echo "Il ne reste plus qu'à reconfigurer le grub."
