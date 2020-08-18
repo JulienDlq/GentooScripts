@@ -160,7 +160,7 @@ then
 	# Dans le cas où il faut mettre à jour le fichier initramfs
 	# Il n'y a qu'à lancer la commande de mise-à-jour, rien de plus
 	echo 'Lancement de la mise-à-jour du fichier initramfs.'
-	genkernel initramfs
+	dracut --hostonly --force
 	echo
 else
 	# Dans le cas où il faut construire
@@ -172,6 +172,10 @@ else
 
 	echo 'Lancement de la construction du noyau.'
 	genkernel $MENUCONFIG all
+	echo
+
+	echo 'Lancement de la construction du fichier initramfs.'
+	dracut --hostonly --force
 	echo
 fi
 
