@@ -12,6 +12,3 @@ FORCE=0
 # Pas de menuconfig
 SETMENUCONFIG=0
 
-# Reconstruction des modules (désactivée par défaut)
-MODULEREBUILD=0
-

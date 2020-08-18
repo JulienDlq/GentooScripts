@@ -173,14 +173,6 @@ else
 	echo 'Lancement de la construction du noyau.'
 	genkernel $MENUCONFIG all
 	echo
-
-	# Dans le cas où il y a des modules noyau à reconstruire
-	# Il faut lancer la reconstruction
-	if [[ $MODULEREBUILD -eq 1 ]]
-	then
-		echo 'Lancement de la reconstruction des modules.'
-		emerge $VERBOSE $QUIET --with-bdeps=y @module-rebuild
-	fi
 fi
 
 echo "Il ne reste plus qu'à reconfigurer le grub."
