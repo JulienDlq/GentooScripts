@@ -171,7 +171,7 @@ else
 	echo
 
 	echo 'Lancement de la construction du noyau.'
-	genkernel $MENUCONFIG all
+	genkernel $MENUCONFIG kernel
 	echo
 
 	echo 'Lancement de la construction du fichier initramfs.'
