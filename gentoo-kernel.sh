@@ -157,10 +157,48 @@ fi
 
 if [[ $INITRAMFSUPDATE -eq 1 ]]
 then
+	# Monter la partition
+
+	# Vérification pour éviter d'avoir des messages d'erreur prévisible
+	# de la commande mount
+	mount | grep $BOOT 2>/dev/null 1>&2
+	result=$?
+	if [[ $result -eq 1 ]]
+	then
+		echo "La partition "${BOOT}" va être montée."
+		mount ${BOOT}
+	elif [[ $result -eq 0 ]]
+	then
+		echo "La partition "${BOOT}" est déjà montée."
+	else
+		echo "Erreur non gérée (Montage "${BOOT}")."
+		exit 1
+	fi
+	echo
+
 	# Dans le cas où il faut mettre à jour le fichier initramfs
 	# Il n'y a qu'à lancer la commande de mise-à-jour, rien de plus
 	echo 'Lancement de la mise-à-jour du fichier initramfs.'
 	dracut --hostonly --force
+	echo
+
+	# Démonter la partition
+
+	# Vérification pour éviter d'avoir des messages d'erreur prévisible
+	# de la commande umount
+	mount | grep $BOOT 2>/dev/null 1>&2
+	result=$?
+	if [[ $result -eq 0 ]]
+	then
+		echo "La partition "${BOOT}" va être démontée."
+		umount ${BOOT}
+	elif [[ $result -eq 1 ]]
+	then
+		echo "La partition "${BOOT}" est déjà démontée."
+	else
+		echo "Erreur non gérée (Démontage "${BOOT}")"
+		exit 1
+	fi
 	echo
 else
 	# Dans le cas où il faut construire
@@ -174,8 +212,46 @@ else
 	genkernel $MENUCONFIG kernel
 	echo
 
+	# Monter la partition
+
+	# Vérification pour éviter d'avoir des messages d'erreur prévisible
+	# de la commande mount
+	mount | grep $BOOT 2>/dev/null 1>&2
+	result=$?
+	if [[ $result -eq 1 ]]
+	then
+		echo "La partition "${BOOT}" va être montée."
+		mount ${BOOT}
+	elif [[ $result -eq 0 ]]
+	then
+		echo "La partition "${BOOT}" est déjà montée."
+	else
+		echo "Erreur non gérée (Montage "${BOOT}")."
+		exit 1
+	fi
+	echo
+
 	echo 'Lancement de la construction du fichier initramfs.'
 	dracut --hostonly --force
+	echo
+
+	# Démonter la partition
+
+	# Vérification pour éviter d'avoir des messages d'erreur prévisible
+	# de la commande umount
+	mount | grep $BOOT 2>/dev/null 1>&2
+	result=$?
+	if [[ $result -eq 0 ]]
+	then
+		echo "La partition "${BOOT}" va être démontée."
+		umount ${BOOT}
+	elif [[ $result -eq 1 ]]
+	then
+		echo "La partition "${BOOT}" est déjà démontée."
+	else
+		echo "Erreur non gérée (Démontage "${BOOT}")"
+		exit 1
+	fi
 	echo
 fi
 
