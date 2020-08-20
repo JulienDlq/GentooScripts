@@ -105,7 +105,7 @@ echo
 # Récupération des informations pour la prise de décision
 noyau_actuel=$(echo linux-$(uname -r | sed 's/-x86_64//') | sed 's/linux-//')
 noyau_a_construire=$(eselect kernel show | tail -n1 | tr -s ' ' | sed 's/.*linux-//')
-noyau_installe_dernier=$(ls -1rt /boot | grep '^vmlinuz-' | sed 's/vmlinuz-//' | sed 's/-x86_64//' | tail -n1)
+noyau_installe_dernier=$(ls -1rt $BOOT | grep '^vmlinuz-' | sed 's/vmlinuz-//' | sed 's/-x86_64//' | tail -n1)
 
 echo -n 'Noyau actuel             :' $noyau_actuel
 echo
