@@ -178,6 +178,12 @@ then
 
 	# Dans le cas où il faut mettre à jour le fichier initramfs
 	# Il n'y a qu'à lancer la commande de mise-à-jour, rien de plus
+  if [[ -f "${BOOT}/initramfs-${noyau_a_construire}-x86_64.img" ]]
+  then
+      echo 'Sauvegarde du fichier initramfs précédent.'
+      mv ${BOOT}/initramfs-${noyau_a_construire}-x86_64.img ${BOOT}/initramfs-${noyau_a_construire}-x86_64.old.img
+      echo
+  fi
 	echo 'Lancement de la mise-à-jour du fichier initramfs.'
 	dracut --hostonly --force --kver ${noyau_a_construire}-x86_64
 	echo
@@ -231,6 +237,12 @@ else
 	fi
 	echo
 
+  if [[ -f "${BOOT}/initramfs-${noyau_a_construire}-x86_64.img" ]]
+  then
+      echo 'Sauvegarde du fichier initramfs précédent.'
+      mv ${BOOT}/initramfs-${noyau_a_construire}-x86_64.img ${BOOT}/initramfs-${noyau_a_construire}-x86_64.old.img
+      echo
+  fi
 	echo 'Lancement de la construction du fichier initramfs.'
 	dracut --hostonly --force --kver ${noyau_a_construire}-x86_64
 	echo
