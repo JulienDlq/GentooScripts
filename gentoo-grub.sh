@@ -22,6 +22,7 @@ fi
 
 # Variables globales
 BOOT=/boot
+MODULES_PATH=/lib/modules/
 
 ## Penser à installer app-admin/eclean-kernel
 ## Nettoyer en mode destructif (on ne veut garder que les NBMAXKERNEL noyaux même s'ils sont référencés dans GRUB)
@@ -46,6 +47,25 @@ else
 	echo
 	exit 1
 fi
+
+# Nettoyage des noyaux
+echo 'Suppression des noyaux obsolètes.'
+numero_noyau=0
+for pattern in $(ls -1t $BOOT | grep vmlinuz | sed 's/^vmlinuz-//')
+do
+	((numero_noyau++))
+	if [[ $numero_noyau -gt $NBMAXKERNEL ]]
+	then
+		echo '- '$pattern
+		find $BOOT -name "*$pattern" -delete
+		find $BOOT -name "*$pattern.img" -delete
+    if [[ -d "${MODULES_PATH}${pattern}" ]]
+    then
+		    rm -rf ${MODULES_PATH}${pattern}
+    fi
+	fi
+done
+echo
 
 # Reconfiguration de grub
 echo "La configuration de grub va être modifée :"
