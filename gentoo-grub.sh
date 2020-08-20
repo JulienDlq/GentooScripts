@@ -22,7 +22,6 @@ fi
 
 # Variables globales
 BOOT=/boot
-SRC=/usr/src
 
 ## Penser à installer app-admin/eclean-kernel
 ## Nettoyer en mode destructif (on ne veut garder que les NBMAXKERNEL noyaux même s'ils sont référencés dans GRUB)
