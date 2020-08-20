@@ -24,11 +24,11 @@ fi
 BOOT=/boot
 SRC=/usr/src
 
-# Penser à installer app-admin/eclean-kernel
-# Nettoyer en mode destructif (on ne veut garder que les NBMAXKERNEL noyaux même s'ils sont référencés dans GRUB)
-echo "Nettoyage des Noyaux :"
-eclean-kernel -d -n $NBMAXKERNEL
-echo
+## Penser à installer app-admin/eclean-kernel
+## Nettoyer en mode destructif (on ne veut garder que les NBMAXKERNEL noyaux même s'ils sont référencés dans GRUB)
+#echo "Nettoyage des Noyaux :"
+#eclean-kernel -d -n $NBMAXKERNEL
+#echo
 
 # Monter la partition
 # Vérification pour éviter d'avoir des messages d'erreur prévisible
