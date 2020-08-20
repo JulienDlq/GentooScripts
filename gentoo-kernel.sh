@@ -103,9 +103,9 @@ fi
 echo
 
 # Récupération des informations pour la prise de décision
-noyau_actuel=$(echo linux-$(uname -r) | sed 's/linux-//')
-noyau_a_construire=$(ls -l /usr/src/linux | tr -s ' ' | cut -d' ' -f11 | sed 's/linux-//')
-noyau_installe_dernier=$(ls -lrt /boot | tr -s ' ' | cut -d' ' -f9 | grep '^kernel-' | sed 's/kernel-genkernel-x86_64-//' | tail -n1)
+noyau_actuel=$(echo linux-$(uname -r | sed 's/-x86_64//') | sed 's/linux-//')
+noyau_a_construire=$(eselect kernel show | tail -n1 | tr -s ' ' | sed 's/.*linux-//')
+noyau_installe_dernier=$(ls -1rt /boot | grep '^vmlinuz-' | sed 's/vmlinuz-//' | sed 's/-x86_64//' | tail -n1)
 
 echo -n 'Noyau actuel             :' $noyau_actuel
 echo
@@ -205,7 +205,7 @@ else
 	# Il faut récupérer la configuration du noyau actuel
 	# et la rendre disponible pour le nouveau noyau
 	echo 'Récupération de la configuration du noyau actuel'
-	cp -v /usr/src/linux-$(uname -r)/.config /usr/src/linux/.config
+	cp -v /usr/src/linux-$(uname -r | sed 's/-x86_64//')/.config /usr/src/linux/.config
 	echo
 
 	echo 'Lancement de la construction du noyau.'
