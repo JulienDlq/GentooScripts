@@ -179,7 +179,7 @@ then
 	# Dans le cas où il faut mettre à jour le fichier initramfs
 	# Il n'y a qu'à lancer la commande de mise-à-jour, rien de plus
 	echo 'Lancement de la mise-à-jour du fichier initramfs.'
-	dracut --hostonly --force
+	dracut --hostonly --force --kver ${noyau_a_construire}-x86_64
 	echo
 
 	# Démonter la partition
@@ -232,7 +232,7 @@ else
 	echo
 
 	echo 'Lancement de la construction du fichier initramfs.'
-	dracut --hostonly --force
+	dracut --hostonly --force --kver ${noyau_a_construire}-x86_64
 	echo
 
 	# Démonter la partition
