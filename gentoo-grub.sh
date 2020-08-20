@@ -43,7 +43,7 @@ else
 fi
 
 # Nettoyage des noyaux
-echo 'Suppression des noyaux obsolètes.'
+echo 'Gestion des noyaux et modules :'
 numero_noyau=0
 for pattern in $(ls -1t $BOOT | grep vmlinuz | sed 's/^vmlinuz-//')
 do
@@ -53,10 +53,12 @@ do
 		echo '- '$pattern
 		find $BOOT -name "*$pattern" -delete
 		find $BOOT -name "*$pattern.img" -delete
-    if [[ -d "${MODULES_PATH}${pattern}" ]]
-    then
-		    rm -rf ${MODULES_PATH}${pattern}
-    fi
+		if [[ -d "${MODULES_PATH}${pattern}" ]]
+		then
+			rm -rf ${MODULES_PATH}${pattern}
+		fi
+	else
+		echo '+ '$pattern
 	fi
 done
 echo
