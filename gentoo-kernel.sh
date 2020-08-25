@@ -14,7 +14,6 @@ cd $SCRIPTPATH
 verificationAdmin
 
 # Variables globales
-BOOT=/boot
 SRC=/usr/src
 
 function lancerDracut
@@ -103,23 +102,7 @@ function forcer()
 }
 
 # Monter la partition
-
-# Vérification pour éviter d'avoir des messages d'erreur prévisible
-# de la commande mount
-mount | grep $BOOT 2>/dev/null 1>&2
-result=$?
-if [[ $result -eq 1 ]]
-then
-	echo "La partition "${BOOT}" va être montée."
-	mount ${BOOT}
-elif [[ $result -eq 0 ]]
-then
-	echo "La partition "${BOOT}" est déjà montée."
-else
-	echo "Erreur non gérée (Montage "${BOOT}")."
-	exit 1
-fi
-echo
+monterBoot
 
 # Récupération des informations pour la prise de décision
 noyau_actuel=$(echo linux-$(uname -r | sed 's/-x86_64//') | sed 's/linux-//')
@@ -135,23 +118,7 @@ echo
 echo
 
 # Démonter la partition
-
-# Vérification pour éviter d'avoir des messages d'erreur prévisible
-# de la commande umount
-mount | grep $BOOT 2>/dev/null 1>&2
-result=$?
-if [[ $result -eq 0 ]]
-then
-	echo "La partition "${BOOT}" va être démontée."
-	umount ${BOOT}
-elif [[ $result -eq 1 ]]
-then
-	echo "La partition "${BOOT}" est déjà démontée."
-else
-	echo "Erreur non gérée (Démontage "${BOOT}")"
-	exit 1
-fi
-echo
+demonterBoot
 
 # Prise de décision
 if [[ $INITRAMFSUPDATE -eq 1 ]]
@@ -177,46 +144,13 @@ fi
 if [[ $INITRAMFSUPDATE -eq 1 ]]
 then
 	# Monter la partition
-
-	# Vérification pour éviter d'avoir des messages d'erreur prévisible
-	# de la commande mount
-	mount | grep $BOOT 2>/dev/null 1>&2
-	result=$?
-	if [[ $result -eq 1 ]]
-	then
-		echo "La partition "${BOOT}" va être montée."
-		mount ${BOOT}
-	elif [[ $result -eq 0 ]]
-	then
-		echo "La partition "${BOOT}" est déjà montée."
-	else
-		echo "Erreur non gérée (Montage "${BOOT}")."
-		exit 1
-	fi
-	echo
+	monterBoot
 
 	# Mise à jour du fichier initramfs
-
 	lancerDracut
 
 	# Démonter la partition
-
-	# Vérification pour éviter d'avoir des messages d'erreur prévisible
-	# de la commande umount
-	mount | grep $BOOT 2>/dev/null 1>&2
-	result=$?
-	if [[ $result -eq 0 ]]
-	then
-		echo "La partition "${BOOT}" va être démontée."
-		umount ${BOOT}
-	elif [[ $result -eq 1 ]]
-	then
-		echo "La partition "${BOOT}" est déjà démontée."
-	else
-		echo "Erreur non gérée (Démontage "${BOOT}")"
-		exit 1
-	fi
-	echo
+	demonterBoot
 else
 	# Dans le cas où il faut construire
 	# Il faut récupérer la configuration du noyau actuel
@@ -230,46 +164,13 @@ else
 	echo
 
 	# Monter la partition
+	monterBoot
 
-	# Vérification pour éviter d'avoir des messages d'erreur prévisible
-	# de la commande mount
-	mount | grep $BOOT 2>/dev/null 1>&2
-	result=$?
-	if [[ $result -eq 1 ]]
-	then
-		echo "La partition "${BOOT}" va être montée."
-		mount ${BOOT}
-	elif [[ $result -eq 0 ]]
-	then
-		echo "La partition "${BOOT}" est déjà montée."
-	else
-		echo "Erreur non gérée (Montage "${BOOT}")."
-		exit 1
-	fi
-	echo
-
-  # Construction du fichier initramfs
-
+	# Construction du fichier initramfs
 	lancerDracut 1
 
 	# Démonter la partition
-
-	# Vérification pour éviter d'avoir des messages d'erreur prévisible
-	# de la commande umount
-	mount | grep $BOOT 2>/dev/null 1>&2
-	result=$?
-	if [[ $result -eq 0 ]]
-	then
-		echo "La partition "${BOOT}" va être démontée."
-		umount ${BOOT}
-	elif [[ $result -eq 1 ]]
-	then
-		echo "La partition "${BOOT}" est déjà démontée."
-	else
-		echo "Erreur non gérée (Démontage "${BOOT}")"
-		exit 1
-	fi
-	echo
+	demonterBoot
 fi
 
 echo "Il ne reste plus qu'à reconfigurer le grub."

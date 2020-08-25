@@ -1,9 +1,52 @@
+# Variables globales
+BOOT=/boot
+
 # Forcer les scripts à être lancé en root seulement
 function verificationAdmin
 {
-  if [ "$(id -u)" != "0" ]; then
-  	echo "Utiliser sudo pour lancer le script $SCRIPTNAME" 1>&2
-  	exit 1
-  fi
+	if [ "$(id -u)" != "0" ]; then
+		echo "Utiliser sudo pour lancer le script $SCRIPTNAME" 1>&2
+		exit 1
+	fi
+}
+
+# Monter la partition de boot
+function monterBoot {
+	# Vérification pour éviter d'avoir des messages d'erreur prévisible
+	# de la commande mount
+	mount | grep $BOOT 2>/dev/null 1>&2
+	result=$?
+	if [[ $result -eq 1 ]]
+	then
+		echo "La partition "${BOOT}" va être montée."
+		mount ${BOOT}
+	elif [[ $result -eq 0 ]]
+	then
+		echo "La partition "${BOOT}" est déjà montée."
+	else
+		echo "Erreur non gérée (Montage "${BOOT}")."
+		exit 1
+	fi
+	echo
+}
+
+# Démonter la partition de boot
+function demonterBoot {
+	# Vérification pour éviter d'avoir des messages d'erreur prévisible
+	# de la commande umount
+	mount | grep $BOOT 2>/dev/null 1>&2
+	result=$?
+	if [[ $result -eq 0 ]]
+	then
+		echo "La partition "${BOOT}" va être démontée."
+		umount ${BOOT}
+	elif [[ $result -eq 1 ]]
+	then
+		echo "La partition "${BOOT}" est déjà démontée."
+	else
+		echo "Erreur non gérée (Démontage "${BOOT}")"
+		exit 1
+	fi
+	echo
 }
 
