@@ -17,6 +17,25 @@ verificationAdmin
 BOOT=/boot
 SRC=/usr/src
 
+function lancerDracut
+{
+	constructionInitramfs=$1
+	if [[ $constructionInitramfs -eq 1 ]]
+	then
+		if [[ -f "${BOOT}/initramfs-${noyau_a_construire}-x86_64.img" ]]
+		then
+			echo 'Sauvegarde du fichier initramfs précédent.'
+			mv ${BOOT}/initramfs-${noyau_a_construire}-x86_64.img ${BOOT}/initramfs-${noyau_a_construire}-x86_64.old.img
+			echo
+		fi
+		echo 'Lancement de la construction du fichier initramfs.'
+	else
+		echo 'Lancement de la mise-à-jour du fichier initramfs.'
+	fi
+	dracut --hostonly --force --kver ${noyau_a_construire}-x86_64
+	echo
+}
+
 if [[ $SETVERBOSE -eq 1 ]]
 then
 	VERBOSE="--verbose"
@@ -176,11 +195,9 @@ then
 	fi
 	echo
 
-	# Dans le cas où il faut mettre à jour le fichier initramfs
-	# Il n'y a qu'à lancer la commande de mise-à-jour, rien de plus
-	echo 'Lancement de la mise-à-jour du fichier initramfs.'
-	dracut --hostonly --force --kver ${noyau_a_construire}-x86_64
-	echo
+	# Mise à jour du fichier initramfs
+
+	lancerDracut
 
 	# Démonter la partition
 
@@ -231,15 +248,9 @@ else
 	fi
 	echo
 
-  if [[ -f "${BOOT}/initramfs-${noyau_a_construire}-x86_64.img" ]]
-  then
-      echo 'Sauvegarde du fichier initramfs précédent.'
-      mv ${BOOT}/initramfs-${noyau_a_construire}-x86_64.img ${BOOT}/initramfs-${noyau_a_construire}-x86_64.old.img
-      echo
-  fi
-	echo 'Lancement de la construction du fichier initramfs.'
-	dracut --hostonly --force --kver ${noyau_a_construire}-x86_64
-	echo
+  # Construction du fichier initramfs
+
+	lancerDracut 1
 
 	# Démonter la partition
 
