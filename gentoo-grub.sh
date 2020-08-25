@@ -21,26 +21,10 @@ then
 fi
 
 # Variables globales
-BOOT=/boot
 MODULES_PATH=/lib/modules/
 
 # Monter la partition
-# Vérification pour éviter d'avoir des messages d'erreur prévisible
-# de la commande mount
-mount | grep $BOOT 2>/dev/null 1>&2
-result=$?
-if [[ $result -eq 1 ]]
-then
-	mount ${BOOT}
-elif [[ $result -eq 0 ]]
-then
-	echo "La partition "${BOOT}" est déjà montée."
-	echo
-else
-	echo "Erreur non gérée (Montage "${BOOT}")"
-	echo
-	exit 1
-fi
+monterBoot
 
 # Nettoyage des noyaux
 echo 'Gestion des noyaux et modules :'
@@ -69,21 +53,6 @@ grub-mkconfig -o ${BOOT}/grub/grub.cfg
 echo
 
 # Démonter la partition
-# Vérification pour éviter d'avoir des messages d'erreur prévisible
-# de la commande umount
-mount | grep $BOOT 2>/dev/null 1>&2
-result=$?
-if [[ $result -eq 0 ]]
-then
-	umount ${BOOT}
-elif [[ $result -eq 1 ]]
-then
-	echo "La partition "${BOOT}" est déjà démontée."
-	echo
-else
-	echo "Erreur non gérée (Démontage "${BOOT}")"
-	echo
-	exit 1
-fi
+demonterBoot
 
 exit 0
