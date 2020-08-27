@@ -4,40 +4,41 @@
 coef=10
 
 # Tailles
-top_sx=$(( 800 ))                                             # Reference
-top_sy=$(( 70 * $coef ))                                      # Reference
-top_px=$(( 2 * $coef ))                                       # Reference
-top_py=$(( 2 * $coef ))                                       # Reference
+top_sx=$(( 700 ))                                               # Reference
+top_sy=$(( 65 * $coef ))                                        # Reference
+top_px=$(( 20 ))                                                # Reference
+top_py=$(( 20 ))                                                # Reference
 
-iotop_px=$(( $top_px ))                                       # Linked to top window
-iotop_py=$(( $top_py + $top_sy + 50 ))                        # Linked to top window
-iotop_sx=$(( $top_sx ))                                       # Linked to top window
-iotop_sy=$(( 99 * $coef - $iotop_py ))                        # Reference
+iotop_sx=$(( $top_sx ))                                         # Linked to top window
+iotop_sy=$(( 13 * $coef ))                                      # Reference
+iotop_px=$(( $top_px ))                                         # Linked to top window
+iotop_py=$(( $top_py + $top_sy + 50 ))                          # Linked to top window
 
-ccache_sx=$(( 480 ))                                          # Reference
-ccache_sy=$(( 515 ))                                          # Reference
-ccache_px=$(( $top_px + $top_sx + 25 ))                       # Linked to top window
-ccache_py=$(( $top_py ))                                      # Linked to top window
+df_sx=$(( $iotop_sx ))                                          # Linked to iotop window
+df_sy=$(( 10 * $coef ))                                         # Reference
+df_px=$(( $iotop_px ))                                          # Linked to iotop window
+df_py=$(( $iotop_py + $iotop_sy + 50 ))                         # Linked to iotop window
 
-ccache_root_sx=$(( 480 ))                                     # Reference
-ccache_root_sy=$(( $ccache_sy - 165 ))                        # Linked to ccache window
-ccache_root_px=$(( $ccache_px ))                              # Linked to ccache window
-ccache_root_py=$(( $iotop_py + $iotop_sy - $ccache_root_sy )) # Linked to iotop window
+ccache_sx=$(( 480 ))                                            # Reference
+ccache_sy=$(( 515 ))                                            # Reference
+ccache_px=$(( $top_px + $top_sx + 20 ))                         # Linked to top window
+ccache_py=$(( $top_py ))                                        # Linked to top window
 
-genlop_sx=$(( 540 ))                                          # Reference
-genlop_sy=$(( 200 ))                                          # Reference
-genlop_px=$(( $ccache_root_px + $ccache_root_sx + 25 ))       # Linked to ccache_root window
-genlop_py=$(( $ccache_root_py + 5 * $coef ))                  # Linked to ccache_root window
+ccache_root_sx=$(( 480 ))                                       # Reference
+ccache_root_sy=$(( $ccache_sy - 165 ))                          # Linked to ccache window
+ccache_root_px=$(( $ccache_px ))                                # Linked to ccache window
+ccache_root_py=$(( $df_py + $df_sy - $ccache_root_sy ))         # Linked to df window
 
-sensors_sx=$(( 540 ))                                         # Reference
-sensors_sy=$(( 290 ))                                         # Reference
-sensors_px=$(( $ccache_px + $ccache_sx + 25 ))                # Linked to ccache window
-sensors_py=$(( $ccache_py ))                                  # Linked to ccache window
+sensors_sx=$(( 660 ))                                           # Reference
+sensors_sy=$(( 73 * $coef ))                                    # Reference
+sensors_px=$(( $ccache_px + $ccache_sx + 20 ))                  # Linked to ccache window
+sensors_py=$(( $ccache_py ))                                    # Linked to ccache window
 
-df_sx=$(( 540 ))                                              # Reference
-df_sy=$(( 130 ))                                              # Reference
-df_px=$(( $sensors_px ))                                      # Linked to sensors window
-df_py=$(( $sensors_py + $sensors_sy + 50 ))                   # Linked to sensors window
+genlop_sx=$(( $sensors_sx ))                                    # Linked to sensors window
+genlop_sy=$(( 200 ))                                            # Reference
+genlop_px=$(( $ccache_root_px + $ccache_root_sx + 20 ))         # Linked to ccache_root window
+genlop_py=$(( $ccache_root_py + $ccache_root_sy - $genlop_sy )) # Linked to ccache_root window
+
 
 # Il faut ajouter les lignes suivantes dans le fichier /etc/sudoers afin de ne pas avoir à fournir le mot de passe à sudo
 # %wheel ALL=(ALL) NOPASSWD: /usr/bin/watch -n1 -- ccache -s
