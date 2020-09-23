@@ -35,8 +35,8 @@ do
 	if [[ $numero_noyau -gt $NBMAXKERNEL ]]
 	then
 		echo '- '$pattern
-		find $BOOT -name "*$pattern" -delete
-		find $BOOT -name "*$pattern.img" -delete
+		find $BOOT -name "*${pattern}" -delete
+		find $BOOT -name "*${pattern}.img" -delete
 		if [[ -d "${MODULES_PATH}${pattern}" ]]
 		then
 			rm -rf ${MODULES_PATH}${pattern}
