@@ -7,7 +7,7 @@ Ce script permet de mettre à jour simplement et rapidement une Gentoo.
 ## gentoo-kernel.sh
 Ce script permet de construire le noyau GNU/Linux simplement et rapidement pour une Gentoo.
 
-## gentoo-grub.sh
+## gentoo-grub.pl
 Ce script permet de mettre à jour simplement et rapidement la configuration de grub en fonction des noyaux présents dans /boot.
 
 ## gentoo-save.sh
