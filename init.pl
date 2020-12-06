@@ -19,4 +19,26 @@ sub verification_admin {
     }
 }
 
+# Exécuter une commande et obtenir sa sortie via la commande Perl system
+sub executer {
+    my $commande = shift // croak 'pas de commande fournie pour executer';
+
+    system $commande;
+
+    if ( $? == -1 ) {
+        journaliser 'Problème d\'exécution: ' . $! . '\n';
+        return $?;
+    }
+    elsif ( $? & 127 ) {
+        journaliser 'Le fils est mort avec le signal '
+          . ( $? & 127 ) . ', '
+          . ( ( $? & 128 ) ? 'avec' : 'sans' )
+          . ' coredump.';
+        return $? & 127;
+    }
+    else {
+        return $? >> 8;
+    }
+}
+
 1;
