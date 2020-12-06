@@ -3,6 +3,8 @@ use warnings;
 use feature 'say';
 use Carp;
 
+my $BOOT = '/boot';
+
 # Permet d'appeler say mais avec une date locale avant
 sub journaliser {
     my $texte = shift // croak 'pas de texte fourni pour journaliser.';
@@ -38,6 +40,46 @@ sub executer {
     }
     else {
         return $? >> 8;
+    }
+}
+
+# Monter la partition de boot
+sub monter_boot {
+
+    # Vérification pour éviter d'avoir des messages d'erreur prévisible
+    # de la commande mount
+    my $sortie_mount =
+      executer( 'mount | grep ' . $BOOT . ' 2>/dev/null 1>&2' );
+
+    if ( $sortie_mount == 1 ) {
+        journaliser( 'La partition ' . $BOOT . ' va être montée.' );
+        system 'mount ' . $BOOT;
+    }
+    elsif ( $sortie_mount == 0 ) {
+        journaliser( 'La partition ' . $BOOT . ' est déjà montée.' );
+    }
+    else {
+        journaliser( 'Erreur non gérée (Montage "' . $BOOT . '").' );
+    }
+}
+
+# Démonter la partition de boot
+sub demonter_boot {
+
+    # Vérification pour éviter d'avoir des messages d'erreur prévisible
+    # de la commande umount
+    my $sortie_mount =
+        executer( 'mount | grep ' . $BOOT . ' 2>/dev/null 1>&2' );
+
+    if ( $sortie_mount == 0 ) {
+        journaliser( 'La partition ' . $BOOT . ' va être démontée.' );
+        system 'umount ' . $BOOT;
+    }
+    elsif ( $sortie_mount == 1 ) {
+        journaliser( 'La partition ' . $BOOT . ' est déjà démontée.' );
+    }
+    else {
+        journaliser( 'Erreur non gérée (Démontage "' . $BOOT . '").' );
     }
 }
 
