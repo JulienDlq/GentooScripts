@@ -3,7 +3,7 @@ use warnings;
 use feature 'say';
 use Carp;
 
-my $BOOT = '/boot';
+our $BOOT = '/boot';
 
 # Permet d'appeler say mais avec une date locale avant
 sub journaliser {
