@@ -19,3 +19,5 @@ Ce script permet de monitorer simplement et rapidement le système Gentoo pendan
 ## gentoo-tail.sh
 Ce script permet de suivre simplement et rapidement le fichier journal de la compilation en cours sur un système Gentoo.
 
+## gentoo-borg-save.pl
+Ce script permet de sauvegarder simplement et rapidement un ensemble de fichiers/dossiers à l'aide de l'utilitaire borgbackup.
