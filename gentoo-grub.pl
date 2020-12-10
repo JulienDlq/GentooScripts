@@ -19,7 +19,6 @@ chdir $CHEMIN_DU_SCRIPT;
 require './init.pl';
 our $BOOT;
 
-
 ###
 # Chargement de la configuration du script
 
