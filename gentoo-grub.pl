@@ -9,14 +9,21 @@ use File::Path qw(remove_tree);
 use Getopt::Long qw(GetOptions);
 Getopt::Long::Configure qw(gnu_getopt);
 
-my $NOM_DU_SCRIPT    = basename($0);
-my $CHEMIN_DU_SCRIPT = dirname($0);
-chdir $CHEMIN_DU_SCRIPT;
+my $NOM_DU_SCRIPT;
+my $CHEMIN_DU_SCRIPT;
+my $LIB;
+
+BEGIN {
+    $NOM_DU_SCRIPT    = basename($0);
+    $CHEMIN_DU_SCRIPT = dirname($0);
+    chdir $CHEMIN_DU_SCRIPT;
+    $LIB = $CHEMIN_DU_SCRIPT . '/lib';
+}
 
 ###
 # Initialisation du script
 
-use lib './lib';
+use lib $LIB;
 use GentooScripts::Core;
 use GentooScripts::GestionBoot;
 use GentooScripts::GestionBoot qw($BOOT);
