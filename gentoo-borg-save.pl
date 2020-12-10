@@ -26,6 +26,7 @@ sub usage {
     say '-d, --depot dépôt : préciser quel dépôt doit être considéré';
     say '-l, --liste       : lister les dépôts disponibles';
     say '-p, --prune       : faire de la place dans le dépôt sélectionné ou dans tous les dépôts disponibles';
+    say '-h, --help        : montrer cette aide';
     print "\n";
 
     exit 0;
@@ -38,7 +39,7 @@ GetOptions(
     'depot|d=s' => \$depot_argument,
     'liste|l'   => \$liste_depots_argument,
     'prune|p'   => \$prune_depots_argument,
-    'help|h'    => usage(),
+    'help|h'    => \&usage,
 ) or usage();
 
 my $source_passphrase = '. ./gentoo-borg-save-secret';
