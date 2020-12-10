@@ -16,7 +16,10 @@ chdir $CHEMIN_DU_SCRIPT;
 ###
 # Initialisation du script
 
-require './init.pl';
+use lib './lib';
+use GentooScripts::Core;
+use GentooScripts::GestionBoot;
+use GentooScripts::GestionBoot qw($BOOT);
 our $BOOT;
 
 ###
