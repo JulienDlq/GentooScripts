@@ -8,11 +8,23 @@ use File::Basename;
 use Getopt::Long qw(GetOptions);
 Getopt::Long::Configure qw(gnu_getopt);
 
-my $NOM_DU_SCRIPT    = basename($0);
-my $CHEMIN_DU_SCRIPT = dirname($0);
-chdir $CHEMIN_DU_SCRIPT;
+my $NOM_DU_SCRIPT;
+my $CHEMIN_DU_SCRIPT;
+my $LIB;
 
-require './init.pl';
+BEGIN {
+    $NOM_DU_SCRIPT    = basename($0);
+    $CHEMIN_DU_SCRIPT = dirname($0);
+    chdir $CHEMIN_DU_SCRIPT;
+    $LIB = $CHEMIN_DU_SCRIPT . '/lib';
+}
+
+###
+# Initialisation du script
+
+use lib $LIB;
+use GentooScripts::Core;
+
 require './gentoo-borg-save-config.pl';
 
 our ( @liste_depots, $disque_sauvegarde,
