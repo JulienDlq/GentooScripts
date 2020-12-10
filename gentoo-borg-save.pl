@@ -38,6 +38,7 @@ GetOptions(
     'depot|d=s' => \$depot_argument,
     'liste|l'   => \$liste_depots_argument,
     'prune|p'   => \$prune_depots_argument,
+    'help|h'    => usage(),
 ) or usage();
 
 my $source_passphrase = '. ./gentoo-borg-save-secret';
