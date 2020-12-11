@@ -222,11 +222,11 @@ foreach my $depot ( @liste_depots ) {
             'borg prune'
           . ' --list'
           . ' --stats'
-          . ' --keep-minutely 1'
-          . ' --keep-hourly   1'
-          . ' --keep-daily    1'
-          . ' --keep-weekly   1'
-          . ' --keep-monthly  1'
+          . ' --keep-minutely 60'
+          . ' --keep-hourly   60'
+          . ' --keep-daily    7'
+          . ' --keep-weekly   2'
+          . ' --keep-monthly  6'
           . ' --keep-yearly   1';
 
         if ( defined( $depots->{$depot}->{'chemin'} )
