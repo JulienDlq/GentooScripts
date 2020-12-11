@@ -223,7 +223,7 @@ foreach my $depot ( @liste_depots ) {
           . ' --list'
           . ' --stats'
           . ' --keep-minutely 60'
-          . ' --keep-hourly   60'
+          . ' --keep-hourly   24'
           . ' --keep-daily    7'
           . ' --keep-weekly   2'
           . ' --keep-monthly  6'
