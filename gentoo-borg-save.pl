@@ -30,6 +30,7 @@ require './gentoo-borg-save-config.pl';
 our ( @liste_depots, $disque_sauvegarde,
     $depots_borgbackup, $nom_de_sauvegarde, $depots, );
 
+# Toute la suite va nécessiter des droits d'admin
 verification_admin();
 
 sub usage {
