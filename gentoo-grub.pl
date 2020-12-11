@@ -9,6 +9,7 @@ use File::Path qw(remove_tree);
 use Getopt::Long qw(GetOptions);
 Getopt::Long::Configure qw(gnu_getopt);
 
+
 my $NOM_DU_SCRIPT;
 my $CHEMIN_DU_SCRIPT;
 my $LIB;
@@ -20,6 +21,7 @@ BEGIN {
     $LIB = $CHEMIN_DU_SCRIPT . '/lib';
 }
 
+
 ###
 # Initialisation du script
 
@@ -28,6 +30,7 @@ use GentooScripts::Core;
 use GentooScripts::GestionBoot;
 use GentooScripts::GestionBoot qw($BOOT);
 our $BOOT;
+
 
 ###
 # Chargement de la configuration du script
