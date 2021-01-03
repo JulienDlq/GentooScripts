@@ -37,7 +37,7 @@ sub usage {
     print "\n";
     say 'Usage : ' . $NOM_DU_SCRIPT . ' [OPTIONS]';
     say '-d, --depot dépôt : préciser quel dépôt doit être considéré';
-    say '-l, --liste       : lister les dépôts disponibles';
+    say '-l, --liste       : lister les dépôts disponibles ou la liste des sauvegarde d\'un dépôt s\'il est précisé';
     say '-p, --prune       : faire de la place dans le dépôt sélectionné ou dans tous les dépôts disponibles';
     say '-h, --help        : montrer cette aide';
     print "\n";
@@ -58,11 +58,66 @@ GetOptions(
 my $source_passphrase = '. ./gentoo-borg-save-secret';
 
 if ($liste_depots_argument) {
-    foreach my $depot (@liste_depots) {
-        say $depot;
+
+    if ( defined ( $depot_argument ) ) {
+
+        my $depot = $depot_argument;
+
+        # Vérifier l'existance de la configuration du dépôt en question
+        if ( not exists( $depots->{$depot} ) ) {
+            journaliser( 'Le dépôt ' . $depot . ' est inconnu.' );
+        }
+        else {
+
+            if ( defined( $depots->{$depot}->{'nom'} )
+                and ( $depots->{$depot}->{'nom'} ne '' ) )
+            {
+                journaliser( 'Liste des sauvegardes du dépôt '
+                      . $depots->{$depot}->{'nom'}
+                      . '.' );
+            }
+            else {
+                croak 'le nom du dépôt n\'est pas défini.';
+            }
+
+            # Construction de la commande borg à utiliser pour le dépôt sélectionné
+            my $commande_borg = 'borg list';
+
+            if ( defined( $depots->{$depot}->{'chemin'} )
+                and ( $depots->{$depot}->{'chemin'} ne '' ) )
+            {
+                $commande_borg =
+                    'export BORG_REPO='
+                  . $depots->{$depot}->{'chemin'} . '; '
+                  . $commande_borg;
+            }
+            else {
+                croak 'le chemin du dépôt n\'est pas défini.';
+            }
+
+            if ( defined($source_passphrase)
+                and ( $source_passphrase ne '' ) )
+            {
+                $commande_borg = $source_passphrase . '; ' . $commande_borg;
+            }
+            else {
+                croak
+                  'le chemin de la passphrase à sourcer n\'est pas défini.';
+            }
+
+            # Lancer la commande borg
+            #journaliser( $commande_borg );
+            system $commande_borg;
+        }
+        exit 0;
+    } else {
+        foreach my $depot (@liste_depots) {
+            say $depot;
+        }
+
+        exit 0;
     }
 
-    exit 0;
 }
 
 # Sélection des différents dépôts à sauvegarder
