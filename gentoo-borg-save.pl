@@ -278,7 +278,7 @@ foreach my $depot ( @liste_depots ) {
             'borg prune'
           . ' --list'
           . ' --stats'
-          . ' --keep-hourly   24'
+          . ' --keep-hourly   6'
           . ' --keep-daily    7'
           . ' --keep-weekly   2'
           . ' --keep-monthly  6'
