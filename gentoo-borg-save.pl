@@ -279,9 +279,9 @@ foreach my $depot ( @liste_depots ) {
           . ' --list'
           . ' --stats'
           . ' --keep-hourly   6'
-          . ' --keep-daily    7'
+          . ' --keep-daily    4'
           . ' --keep-weekly   2'
-          . ' --keep-monthly  6'
+          . ' --keep-monthly  3'
           . ' --keep-yearly   1';
 
         if ( defined( $depots->{$depot}->{'chemin'} )
