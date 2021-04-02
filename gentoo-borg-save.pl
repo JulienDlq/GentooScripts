@@ -261,7 +261,7 @@ foreach my $depot (@liste_depots) {
 		  . ' --list'
 		  . ' --stats'
 		  . ' --keep-hourly   6'
-		  . ' --keep-daily    2'
+		  . ' --keep-daily    1'
 		  . ' --keep-weekly   1'
 		  . ' --keep-monthly  1'
 		  . ' --keep-yearly   1';
