@@ -29,7 +29,7 @@ require './gentoo-borg-save-config.pl';
 
 our (
 	@liste_depots,      $disque_sauvegarde, $depots_borgbackup,
-	$nom_de_sauvegarde, $depots,
+	$nom_de_sauvegarde, $depots, $prune,
 );
 
 # Toute la suite va nécessiter des droits d'admin
@@ -256,15 +256,20 @@ foreach my $depot (@liste_depots) {
 		}
 
 	# Construction de la commande borg à utiliser pour le dépôt sélectionné
-		my $commande_borg =
-			'borg prune'
-		  . ' --list'
-		  . ' --stats'
-		  . ' --keep-hourly   6'
-		  . ' --keep-daily    1'
-		  . ' --keep-weekly   1'
-		  . ' --keep-monthly  1'
-		  . ' --keep-yearly   1';
+	my $commande_borg =
+		'borg prune -v'
+	  . ' --list'
+	  . ' --stats'
+	  . ' --keep-hourly='
+	  . ( $prune->{'hourly'} // 1 )
+	  . ' --keep-daily='
+	  . ( $prune->{'daily'} // 1 )
+	  . ' --keep-weekly='
+	  . ( $prune->{'weekly'} // 1 )
+	  . ' --keep-monthly='
+	  . ( $prune->{'monthly'} // 1 )
+	  . ' --keep-yearly='
+	  . ( $prune->{'yearly'} // 1 );
 
 		if ( defined( $depots->{$depot}->{'chemin'} )
 			and ( $depots->{$depot}->{'chemin'} ne '' ) ) {

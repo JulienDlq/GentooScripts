@@ -28,4 +28,12 @@ our $depots = {
 	},
 };
 
+our $prune = {
+	'hourly'  => 6,
+	'daily'   => 1,
+	'weekly'  => 1,
+	'monthly' => 1,
+	'yearly'  => 1,
+};
+
 1;
