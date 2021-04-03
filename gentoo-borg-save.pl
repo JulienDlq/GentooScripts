@@ -19,29 +19,23 @@ BEGIN {
 	$LIB = $CHEMIN_DU_SCRIPT . '/lib';
 }
 
-
 ###
 # Initialisation du script
 
 use lib $LIB;
 use GentooScripts::Core;
 
-
 ###
 # Chargement de la configuration du script
 
 require './gentoo-borg-save-config.pl';
-our (
-	@liste_depots,      $disque_sauvegarde, $depots_borgbackup,
-	$nom_de_sauvegarde, $depots, $prune,
-);
-
+our ( @liste_depots, $disque_sauvegarde, $depots_borgbackup,
+	$nom_de_sauvegarde, $depots, $prune, );
 
 ###
 # Toute la suite va nécessiter des droits d'admin
 
 verification_admin();
-
 
 ###
 # Gestion des arguments
@@ -59,31 +53,30 @@ my $variables = gestion_arguments(
 			'depot' => {
 				'usage' => '-d, --depot dépôt : '
 				  . 'préciser quel dépôt doit être considéré.',
-				'type'    => 'd=s',
+				'type' => 'd=s',
 			},
 			'liste' => {
 				'usage' => '-l, --liste       : '
 				  . 'lister les dépôts disponibles ou la liste des sauvegarde d\'un dépôt s\'il est précisé.',
-				'type'   => 'l',
+				'type' => 'l',
 			},
 			'prune' => {
 				'usage' => '-p, --prune       : '
 				  . 'faire de la place dans le dépôt sélectionné ou dans tous les dépôts disponibles.',
-				'type'      => 'p',
+				'type' => 'p',
 			},
 		},
 	},
 );
-
 
 ###
 # Lancement du programme principal
 
 my $source_passphrase = '. ./gentoo-borg-save-secret';
 
-if ($variables->{'liste'}) {
+if ( $variables->{'liste'} ) {
 
-	if ( defined($variables->{'depot'}) ) {
+	if ( defined( $variables->{'depot'} ) ) {
 
 		my $depot = $variables->{'depot'};
 
@@ -276,20 +269,20 @@ foreach my $depot (@liste_depots) {
 		}
 
 	# Construction de la commande borg à utiliser pour le dépôt sélectionné
-	my $commande_borg =
-		'borg prune -v'
-	  . ' --list'
-	  . ' --stats'
-	  . ' --keep-hourly='
-	  . ( $prune->{'hourly'} // 1 )
-	  . ' --keep-daily='
-	  . ( $prune->{'daily'} // 1 )
-	  . ' --keep-weekly='
-	  . ( $prune->{'weekly'} // 1 )
-	  . ' --keep-monthly='
-	  . ( $prune->{'monthly'} // 1 )
-	  . ' --keep-yearly='
-	  . ( $prune->{'yearly'} // 1 );
+		my $commande_borg =
+			'borg prune -v'
+		  . ' --list'
+		  . ' --stats'
+		  . ' --keep-hourly='
+		  . ( $prune->{'hourly'} // 1 )
+		  . ' --keep-daily='
+		  . ( $prune->{'daily'} // 1 )
+		  . ' --keep-weekly='
+		  . ( $prune->{'weekly'} // 1 )
+		  . ' --keep-monthly='
+		  . ( $prune->{'monthly'} // 1 )
+		  . ' --keep-yearly='
+		  . ( $prune->{'yearly'} // 1 );
 
 		if ( defined( $depots->{$depot}->{'chemin'} )
 			and ( $depots->{$depot}->{'chemin'} ne '' ) ) {
