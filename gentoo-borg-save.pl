@@ -19,53 +19,73 @@ BEGIN {
 	$LIB = $CHEMIN_DU_SCRIPT . '/lib';
 }
 
+
 ###
 # Initialisation du script
 
 use lib $LIB;
 use GentooScripts::Core;
 
-require './gentoo-borg-save-config.pl';
 
+###
+# Chargement de la configuration du script
+
+require './gentoo-borg-save-config.pl';
 our (
 	@liste_depots,      $disque_sauvegarde, $depots_borgbackup,
 	$nom_de_sauvegarde, $depots, $prune,
 );
 
+
+###
 # Toute la suite va nécessiter des droits d'admin
+
 verification_admin();
 
-sub usage {
-	print "\n";
-	say 'Usage : ' . $NOM_DU_SCRIPT . ' [OPTIONS]';
-	say '-d, --depot dépôt : préciser quel dépôt doit être considéré';
-	say
-'-l, --liste       : lister les dépôts disponibles ou la liste des sauvegarde d\'un dépôt s\'il est précisé';
-	say
-'-p, --prune       : faire de la place dans le dépôt sélectionné ou dans tous les dépôts disponibles';
-	say '-h, --help        : montrer cette aide';
-	print "\n";
 
-	exit 0;
-}
+###
+# Gestion des arguments
 
-my $depot_argument;
-my $liste_depots_argument;
-my $prune_depots_argument;
-GetOptions(
-	'depot|d=s' => \$depot_argument,
-	'liste|l'   => \$liste_depots_argument,
-	'prune|p'   => \$prune_depots_argument,
-	'help|h'    => \&usage,
-) or usage();
+my $variables = gestion_arguments(
+	{
+		# Usage général
+		'usage_general' => 'Usage : '
+		  . $NOM_DU_SCRIPT
+		  . ' [--depot <nom du dépot>] [--liste|--prune]',
+		'usage_ordre' => [ 'depot', 'liste', 'prune', ],
+
+		# Arguments et usage spécifique
+		'arguments' => {
+			'depot' => {
+				'usage' => '-d, --depot dépôt : '
+				  . 'préciser quel dépôt doit être considéré.',
+				'type'    => 'd=s',
+			},
+			'liste' => {
+				'usage' => '-l, --liste       : '
+				  . 'lister les dépôts disponibles ou la liste des sauvegarde d\'un dépôt s\'il est précisé.',
+				'type'   => 'l',
+			},
+			'prune' => {
+				'usage' => '-p, --prune       : '
+				  . 'faire de la place dans le dépôt sélectionné ou dans tous les dépôts disponibles.',
+				'type'      => 'p',
+			},
+		},
+	},
+);
+
+
+###
+# Lancement du programme principal
 
 my $source_passphrase = '. ./gentoo-borg-save-secret';
 
-if ($liste_depots_argument) {
+if ($variables->{'liste'}) {
 
-	if ( defined($depot_argument) ) {
+	if ( defined($variables->{'depot'}) ) {
 
-		my $depot = $depot_argument;
+		my $depot = $variables->{'depot'};
 
 		# Vérifier l'existance de la configuration du dépôt en question
 		if ( not exists( $depots->{$depot} ) ) {
@@ -117,13 +137,13 @@ if ($liste_depots_argument) {
 
 }
 
-# Sélection des différents dépôts à sauvegarder
-if ($depot_argument) {
-	@liste_depots = ($depot_argument);
+# Sélection des différents dépôts à sauvegarder et/ou à réduire
+if ( defined( $variables->{'depot'} ) ) {
+	@liste_depots = ( $variables->{'depot'} );
 }
 
 # Parcours des différents dépôts à sauvegarder
-if ( not $prune_depots_argument ) {
+if ( not $variables->{'prune'} ) {
 
 	foreach my $depot (@liste_depots) {
 
