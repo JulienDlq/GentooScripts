@@ -29,8 +29,7 @@ use GentooScripts::Core;
 # Chargement de la configuration du script
 
 require './gentoo-borg-save-config.pl';
-our ( @liste_depots, $disque_sauvegarde, $depots_borgbackup,
-	$nom_de_sauvegarde, $depots, $prune, );
+our ( @liste_depots, $disque_sauvegarde, $depots_borgbackup, $nom_de_sauvegarde, $depots, $prune, );
 
 ###
 # Toute la suite va nécessiter des droits d'admin
@@ -55,11 +54,13 @@ my $variables = gestion_arguments(
 			},
 			'liste' => {
 				'alias' => 'l',
-				'usage' => 'lister les dépôts disponibles ou la liste des sauvegarde d\'un dépôt s\'il est précisé.',
+				'usage' =>
+				  'lister les dépôts disponibles ou lister les sauvegarde d\'un dépôt s\'il est précisé.',
 			},
 			'prune' => {
 				'alias' => 'p',
-				'usage' => 'faire de la place dans le dépôt sélectionné ou dans tous les dépôts disponibles.',
+				'usage' =>
+				  'faire de la place dans le dépôt sélectionné ou dans tous les dépôts disponibles.',
 			},
 		},
 	},
@@ -83,22 +84,17 @@ if ( $variables->{'liste'} ) {
 
 			if ( defined( $depots->{$depot}->{'nom'} )
 				and ( $depots->{$depot}->{'nom'} ne '' ) ) {
-				journaliser( 'Liste des sauvegardes du dépôt '
-					  . $depots->{$depot}->{'nom'}
-					  . '.' );
+				journaliser( 'Liste des sauvegardes du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
 			} else {
 				croak 'le nom du dépôt n\'est pas défini.';
 			}
 
-	# Construction de la commande borg à utiliser pour le dépôt sélectionné
+			# Construction de la commande borg à utiliser pour le dépôt sélectionné
 			my $commande_borg = 'borg list';
 
 			if ( defined( $depots->{$depot}->{'chemin'} )
 				and ( $depots->{$depot}->{'chemin'} ne '' ) ) {
-				$commande_borg =
-					'export BORG_REPO='
-				  . $depots->{$depot}->{'chemin'} . '; '
-				  . $commande_borg;
+				$commande_borg = 'export BORG_REPO=' . $depots->{$depot}->{'chemin'} . '; ' . $commande_borg;
 			} else {
 				croak 'le chemin du dépôt n\'est pas défini.';
 			}
@@ -107,8 +103,7 @@ if ( $variables->{'liste'} ) {
 				and ( $source_passphrase ne '' ) ) {
 				$commande_borg = $source_passphrase . '; ' . $commande_borg;
 			} else {
-				croak
-				  'le chemin de la passphrase à sourcer n\'est pas défini.';
+				croak 'le chemin de la passphrase à sourcer n\'est pas défini.';
 			}
 
 			# Lancer la commande borg
@@ -143,14 +138,12 @@ if ( not $variables->{'prune'} ) {
 
 			if ( defined( $depots->{$depot}->{'nom'} )
 				and ( $depots->{$depot}->{'nom'} ne '' ) ) {
-				journaliser( 'Sauvegarde du dépôt '
-					  . $depots->{$depot}->{'nom'}
-					  . '.' );
+				journaliser( 'Sauvegarde du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
 			} else {
 				croak 'le nom du dépôt n\'est pas défini.';
 			}
 
-	# Construction de la commande borg à utiliser pour le dépôt sélectionné
+			# Construction de la commande borg à utiliser pour le dépôt sélectionné
 			my $commande_borg = 'borg create';
 
 			if ( exists( $depots->{$depot}->{'verbose'} ) ) {
@@ -212,8 +205,7 @@ if ( not $variables->{'prune'} ) {
 
 				my $liste_elements = '';
 
-				foreach my $element_courant (
-					@{ $depots->{$depot}->{'elements_a_sauver'} } ) {
+				foreach my $element_courant ( @{ $depots->{$depot}->{'elements_a_sauver'} } ) {
 					$liste_elements .= ' ' . $element_courant;
 				}
 
@@ -225,10 +217,7 @@ if ( not $variables->{'prune'} ) {
 
 			if ( defined( $depots->{$depot}->{'chemin'} )
 				and ( $depots->{$depot}->{'chemin'} ne '' ) ) {
-				$commande_borg =
-					'export BORG_REPO='
-				  . $depots->{$depot}->{'chemin'} . '; '
-				  . $commande_borg;
+				$commande_borg = 'export BORG_REPO=' . $depots->{$depot}->{'chemin'} . '; ' . $commande_borg;
 			} else {
 				croak 'le chemin du dépôt n\'est pas défini.';
 			}
@@ -237,8 +226,7 @@ if ( not $variables->{'prune'} ) {
 				and ( $source_passphrase ne '' ) ) {
 				$commande_borg = $source_passphrase . '; ' . $commande_borg;
 			} else {
-				croak
-				  'le chemin de la passphrase à sourcer n\'est pas défini.';
+				croak 'le chemin de la passphrase à sourcer n\'est pas défini.';
 			}
 
 			# Lancer la commande borg
@@ -258,13 +246,12 @@ foreach my $depot (@liste_depots) {
 
 		if ( defined( $depots->{$depot}->{'nom'} )
 			and ( $depots->{$depot}->{'nom'} ne '' ) ) {
-			journaliser(
-				'Réduction du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
+			journaliser( 'Réduction du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
 		} else {
 			croak 'le nom du dépôt n\'est pas défini.';
 		}
 
-	# Construction de la commande borg à utiliser pour le dépôt sélectionné
+		# Construction de la commande borg à utiliser pour le dépôt sélectionné
 		my $commande_borg =
 			'borg prune -v'
 		  . ' --list'
@@ -282,10 +269,7 @@ foreach my $depot (@liste_depots) {
 
 		if ( defined( $depots->{$depot}->{'chemin'} )
 			and ( $depots->{$depot}->{'chemin'} ne '' ) ) {
-			$commande_borg =
-				'export BORG_REPO='
-			  . $depots->{$depot}->{'chemin'} . '; '
-			  . $commande_borg;
+			$commande_borg = 'export BORG_REPO=' . $depots->{$depot}->{'chemin'} . '; ' . $commande_borg;
 		} else {
 			croak 'le chemin du dépôt n\'est pas défini.';
 		}
