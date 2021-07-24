@@ -47,8 +47,12 @@ verification_admin();
 my $variables = gestion_arguments(
 	{
 		# Usage général
-		'usage_general' => 'Usage : ' . $NOM_DU_SCRIPT . ' <--menuconfig=<oui|non>' . ' [--force]' . ' | --initramfs-update>',
-		'usage_ordre'   => [ 'menuconfig', 'force', 'initramfs-update', ],
+		'usage_general' => 'Usage : '
+		  . $NOM_DU_SCRIPT
+		  . ' <--menuconfig=<oui|non>'
+		  . ' [--force]'
+		  . ' | --initramfs-update>',
+		'usage_ordre' => [ 'menuconfig', 'force', 'initramfs-update', ],
 
 		# Arguments et usage spécifique
 		'arguments' => {
@@ -106,8 +110,7 @@ sub lancer_dracut {
 
 		journaliser('Lancement de la mise-à-jour du fichier initramfs.');
 	}
-	executer(
-		'dracut --hostonly --force --kver ' . $noyau_a_construire . '-x86_64' );
+	executer( 'dracut --hostonly --force --kver ' . $noyau_a_construire . '-x86_64' );
 }
 
 sub forcer {
@@ -150,11 +153,10 @@ monter_boot();
 # Récupération des informations pour la prise de décision
 my $noyau_actuel = `uname -r | sed 's/-x86_64//'`;
 chomp($noyau_actuel);
-my $noyau_a_construire =
-  `eselect kernel show | tail -n1 | tr -s ' ' | sed 's/.*linux-//'`;
+my $noyau_a_construire = `eselect kernel show | tail -n1 | tr -s ' ' | sed 's/.*linux-//'`;
 chomp($noyau_a_construire);
 my $noyau_installe_dernier =
-`ls -1rt $BOOT | grep '^vmlinuz-' | sed 's/vmlinuz-//' | sed 's/-x86_64//' | tail -n1`;
+  `ls -1rt $BOOT | grep '^vmlinuz-' | sed 's/vmlinuz-//' | sed 's/-x86_64//' | tail -n1`;
 chomp($noyau_installe_dernier);
 
 # Démonter la partition
@@ -176,9 +178,7 @@ if ( $variables->{'initramfs-update'} ) {
 		'noyau_a_construire'     => $noyau_a_construire,
 		'noyau_installe_dernier' => $noyau_installe_dernier,
 	} ) ) {
-		journaliser(
-'Le dernier noyau installé est en avance sur le noyau à construire.'
-		);
+		journaliser('Le dernier noyau installé est en avance sur le noyau à construire.');
 		forcer( $variables->{'force'} );
 
 	} else {
@@ -208,9 +208,7 @@ if ( $variables->{'initramfs-update'} ) {
 	# Il faut récupérer la configuration du noyau actuel
 	# et la rendre disponible pour le nouveau noyau
 	journaliser('Récupération de la configuration du noyau actuel');
-	executer( 'cp -v /usr/src/linux-'
-		  . $noyau_actuel
-		  . '/.config /usr/src/linux/.config' );
+	executer( 'cp -v /usr/src/linux-' . $noyau_actuel . '/.config /usr/src/linux/.config' );
 
 	journaliser('Lancement de la construction du noyau.');
 	executer( 'genkernel ' . $MENUCONFIG . ' kernel' );
