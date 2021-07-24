@@ -40,10 +40,7 @@ sub executer {
 		journaliser 'Problème d\'exécution: ' . $! . '\n';
 		return $?;
 	} elsif ( $? & 127 ) {
-		journaliser 'Le fils est mort avec le signal '
-		  . ( $? & 127 ) . ', '
-		  . ( ( $? & 128 ) ? 'avec' : 'sans' )
-		  . ' coredump.';
+		journaliser 'Le fils est mort avec le signal ' . ( $? & 127 ) . ', ' . ( ( $? & 128 ) ? 'avec' : 'sans' ) . ' coredump.';
 		return $? & 127;
 	} else {
 		return $? >> 8;
@@ -58,16 +55,43 @@ sub gestion_arguments {
 	our $variables = {};
 	our $options   = {};
 
+	# Insertion de l'aide à la fin
+	push ( @{ $configuration->{'usage_ordre'} }, 'help' );
+	$configuration->{'arguments'}->{'help'} = {
+		'alias'  => 'h',
+		'usage'  => 'montrer cette aide.',
+		'defaut' => 0,
+	};
+
+	# Récupération de la taille des arguments et de la taille de l'argument le plus long
+	our $taille_arguments = {};
+	$taille_arguments->{'max'} = 0;
+
+	foreach my $curr_argument ( @{ $configuration->{'usage_ordre'} } ) {
+		$taille_arguments->{'arguments'}->{$curr_argument} = length($curr_argument);
+		if ( $taille_arguments->{'arguments'}->{$curr_argument} > $taille_arguments->{'max'} ) {
+			$taille_arguments->{'max'} = $taille_arguments->{'arguments'}->{$curr_argument};
+		}
+	}
+
 	# Construction de l'usage
 	sub usage {
 
 		say '';
 		say $configuration->{'usage_general'};
 		foreach my $argument ( @{ $configuration->{'usage_ordre'} } ) {
-			say $configuration->{'arguments'}->{$argument}->{'usage'};
+
+			# Calcul du nombre d'espaces à insérer
+			my $espaces = ' ' x ( $taille_arguments->{'max'} - $taille_arguments->{'arguments'}->{$argument} + 1 );
+
+			say ' -'
+			  . $configuration->{'arguments'}->{$argument}->{'alias'} . ', --'
+			  . $argument
+			  . $espaces . ': '
+			  . $configuration->{'arguments'}->{$argument}->{'usage'};
+
 		}
 
-		say '-h, --help             : montrer cette aide';
 		say '';
 
 		exit 0;
@@ -76,9 +100,22 @@ sub gestion_arguments {
 	# Construction de la table de hash pour GetOptions
 	foreach my $argument ( keys %{ $configuration->{'arguments'} } ) {
 
-		$options->{ $argument . '|'
-			  . $configuration->{'arguments'}->{$argument}->{'type'} } =
-		  \$variables->{$argument};
+		if ( exists( $configuration->{'arguments'}->{$argument}->{'booleen'} ) ) {
+
+			# Le bouléen étant « oui » ou « non », c'est une chaîne de caractère
+			$options->{ $argument . '|' . $configuration->{'arguments'}->{$argument}->{'alias'} . '=s' } =
+			  \$variables->{$argument};
+
+		} elsif ( exists( $configuration->{'arguments'}->{$argument}->{'type'} ) ) {
+
+			$options->{ $argument . '|' . $configuration->{'arguments'}->{$argument}->{'alias'} . '=' . $configuration->{'arguments'}->{$argument}->{'type'} }
+			  = \$variables->{$argument};
+
+		} else {
+
+			$options->{ $argument . '|' . $configuration->{'arguments'}->{$argument}->{'alias'} } =
+			  \$variables->{$argument};
+		}
 	}
 
 	# Ajout forcé de l'aide à la table de hash pour GetOptions
@@ -90,29 +127,12 @@ sub gestion_arguments {
 	# Traitement des arguments
 	foreach my $argument ( keys %{ $configuration->{'arguments'} } ) {
 
-		# Désactivation de toutes les autres variables
-		# dans le cas où l'argument doit les désactiver
-		if (    $configuration->{'arguments'}->{$argument}->{'desactive'}
-			and $variables->{$argument} ) {
-			foreach my $variable_courante ( keys %{$variables} ) {
-
-				next if ( $variable_courante eq $argument );
-				$variables->{$variable_courante} = 0;
-			}
-			last;
-		}
-
-		# Mise à jour des variables avec ce qui a été récupéré,
-		# ou bien de la configuration
-		# ou bien avec la valeur par défaut
 		if ( $configuration->{'arguments'}->{$argument}->{'booleen'} ) {
 			$variables->{$argument} =
 			  args_oui_ou_non( $variables->{$argument}, \&usage );
 		}
 
-		$variables->{$argument} //=
-		  $configuration->{'arguments'}->{$argument}->{'conf'}
-		  // $configuration->{'arguments'}->{$argument}->{'defaut'};
+		$variables->{$argument} //= $configuration->{'arguments'}->{$argument}->{'conf'} // $configuration->{'arguments'}->{$argument}->{'defaut'};
 	}
 
 	return $variables;
