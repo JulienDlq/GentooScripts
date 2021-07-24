@@ -47,35 +47,27 @@ verification_admin();
 my $variables = gestion_arguments(
 	{
 		# Usage général
-		'usage_general' => 'Usage : '
-		  . $NOM_DU_SCRIPT
-		  . ' <--menuconfig=<oui|non>'
-		  . ' [--force]'
-		  . ' | --initramfs-update>',
-		'usage_ordre' => [ 'menuconfig', 'force', 'initramfs-update', ],
+		'usage_general' => 'Usage : ' . $NOM_DU_SCRIPT . ' <--menuconfig=<oui|non>' . ' [--force]' . ' | --initramfs-update>',
+		'usage_ordre'   => [ 'menuconfig', 'force', 'initramfs-update', ],
 
 		# Arguments et usage spécifique
 		'arguments' => {
 			'menuconfig' => {
-				'usage' => '-m, --menuconfig       :'
-				  . ' lancer menuconfig avant la compilation du noyau (oui ou non).',
-				'type'    => 'm=s',
+				'alias'   => 'm',
+				'usage'   => 'lancer menuconfig avant la compilation du noyau (oui ou non).',
 				'conf'    => $CONFIG->{'menuconfig'},
 				'defaut'  => 0,
 				'booleen' => 1,
 			},
 			'force' => {
-				'usage' => '-f, --force            :'
-				  . ' forcer la reconstruction du noyau.',
-				'type'   => 'f',
+				'alias'  => 'f',
+				'usage'  => 'forcer la reconstruction du noyau.',
 				'defaut' => 0,
 			},
 			'initramfs-update' => {
-				'usage' => '-i, --initramfs-update :'
-				  . ' mettre à jour le fichier initramfs du kernel uniquement.',
-				'type'      => 'i',
-				'defaut'    => 0,
-				'desactive' => 1,
+				'alias'  => 'i',
+				'usage'  => 'mettre à jour le fichier initramfs du kernel uniquement.',
+				'defaut' => 0,
 			},
 		},
 	},
