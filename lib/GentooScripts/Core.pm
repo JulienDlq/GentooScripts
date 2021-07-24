@@ -40,7 +40,10 @@ sub executer {
 		journaliser 'Problème d\'exécution: ' . $! . '\n';
 		return $?;
 	} elsif ( $? & 127 ) {
-		journaliser 'Le fils est mort avec le signal ' . ( $? & 127 ) . ', ' . ( ( $? & 128 ) ? 'avec' : 'sans' ) . ' coredump.';
+		journaliser 'Le fils est mort avec le signal '
+		  . ( $? & 127 ) . ', '
+		  . ( ( $? & 128 ) ? 'avec' : 'sans' )
+		  . ' coredump.';
 		return $? & 127;
 	} else {
 		return $? >> 8;
@@ -56,7 +59,7 @@ sub gestion_arguments {
 	our $options   = {};
 
 	# Insertion de l'aide à la fin
-	push ( @{ $configuration->{'usage_ordre'} }, 'help' );
+	push( @{ $configuration->{'usage_ordre'} }, 'help' );
 	$configuration->{'arguments'}->{'help'} = {
 		'alias'  => 'h',
 		'usage'  => 'montrer cette aide.',
@@ -82,7 +85,8 @@ sub gestion_arguments {
 		foreach my $argument ( @{ $configuration->{'usage_ordre'} } ) {
 
 			# Calcul du nombre d'espaces à insérer
-			my $espaces = ' ' x ( $taille_arguments->{'max'} - $taille_arguments->{'arguments'}->{$argument} + 1 );
+			my $espaces =
+			  ' ' x ( $taille_arguments->{'max'} - $taille_arguments->{'arguments'}->{$argument} + 1 );
 
 			say ' -'
 			  . $configuration->{'arguments'}->{$argument}->{'alias'} . ', --'
@@ -108,8 +112,9 @@ sub gestion_arguments {
 
 		} elsif ( exists( $configuration->{'arguments'}->{$argument}->{'type'} ) ) {
 
-			$options->{ $argument . '|' . $configuration->{'arguments'}->{$argument}->{'alias'} . '=' . $configuration->{'arguments'}->{$argument}->{'type'} }
-			  = \$variables->{$argument};
+			$options->{ $argument . '|'
+				  . $configuration->{'arguments'}->{$argument}->{'alias'} . '='
+				  . $configuration->{'arguments'}->{$argument}->{'type'} } = \$variables->{$argument};
 
 		} else {
 
@@ -132,7 +137,8 @@ sub gestion_arguments {
 			  args_oui_ou_non( $variables->{$argument}, \&usage );
 		}
 
-		$variables->{$argument} //= $configuration->{'arguments'}->{$argument}->{'conf'} // $configuration->{'arguments'}->{$argument}->{'defaut'};
+		$variables->{$argument} //= $configuration->{'arguments'}->{$argument}->{'conf'}
+		  // $configuration->{'arguments'}->{$argument}->{'defaut'};
 	}
 
 	return $variables;
