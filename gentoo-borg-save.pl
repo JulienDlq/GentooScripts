@@ -43,27 +43,23 @@ verification_admin();
 my $variables = gestion_arguments(
 	{
 		# Usage général
-		'usage_general' => 'Usage : '
-		  . $NOM_DU_SCRIPT
-		  . ' [--depot <nom du dépot>] [--liste|--prune]',
-		'usage_ordre' => [ 'depot', 'liste', 'prune', ],
+		'usage_general' => 'Usage : ' . $NOM_DU_SCRIPT . ' [--depot <nom du dépot>] [--liste|--prune]',
+		'usage_ordre'   => [ 'depot', 'liste', 'prune', ],
 
 		# Arguments et usage spécifique
 		'arguments' => {
 			'depot' => {
-				'usage' => '-d, --depot dépôt : '
-				  . 'préciser quel dépôt doit être considéré.',
-				'type' => 'd=s',
+				'alias' => 'd',
+				'usage' => 'préciser quel dépôt doit être considéré.',
+				'type'  => 's',
 			},
 			'liste' => {
-				'usage' => '-l, --liste       : '
-				  . 'lister les dépôts disponibles ou la liste des sauvegarde d\'un dépôt s\'il est précisé.',
-				'type' => 'l',
+				'alias' => 'l',
+				'usage' => 'lister les dépôts disponibles ou la liste des sauvegarde d\'un dépôt s\'il est précisé.',
 			},
 			'prune' => {
-				'usage' => '-p, --prune       : '
-				  . 'faire de la place dans le dépôt sélectionné ou dans tous les dépôts disponibles.',
-				'type' => 'p',
+				'alias' => 'p',
+				'usage' => 'faire de la place dans le dépôt sélectionné ou dans tous les dépôts disponibles.',
 			},
 		},
 	},
