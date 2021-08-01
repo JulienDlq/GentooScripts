@@ -153,7 +153,11 @@ if ( $variables->{'supprime'} ) {
 
 			if ( defined( $depots->{$depot}->{'chemin'} )
 				and ( $depots->{$depot}->{'chemin'} ne '' ) ) {
-				$commande_borg = 'export BORG_REPO=' . $depots->{$depot}->{'chemin'} . '; ' . $commande_borg . ' ::' . $variables->{'supprime'};
+				$commande_borg =
+					'export BORG_REPO='
+				  . $depots->{$depot}->{'chemin'} . '; '
+				  . $commande_borg . ' ::'
+				  . $variables->{'supprime'};
 			} else {
 				croak 'le chemin du dépôt n\'est pas défini.';
 			}
@@ -172,7 +176,7 @@ if ( $variables->{'supprime'} ) {
 		exit 0;
 	} else {
 
-		journaliser( 'Aucun dépôt précisé.' );
+		journaliser('Aucun dépôt précisé.');
 
 		exit 0;
 	}
