@@ -139,7 +139,11 @@ if ( $variables->{'supprime'} ) {
 
 			if ( defined( $depots->{$depot}->{'nom'} )
 				and ( $depots->{$depot}->{'nom'} ne '' ) ) {
-				journaliser( 'Suppression de la sauvegarde du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
+				journaliser( 'Suppression de la sauvegarde '
+					  . $variables->{'supprime'}
+					  . ' du dépôt '
+					  . $depots->{$depot}->{'nom'}
+					  . '.' );
 			} else {
 				croak 'le nom du dépôt n\'est pas défini.';
 			}
