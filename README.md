@@ -4,7 +4,7 @@ Quelques scripts pour gérer facilement une Gentoo ; ils sont pour le moment au 
 ## gentoo-maj.sh
 Ce script permet de mettre à jour simplement et rapidement une Gentoo.
 
-## gentoo-kernel.sh
+## gentoo-kernel.pl
 Ce script permet de construire le noyau GNU/Linux simplement et rapidement pour une Gentoo.
 
 ## gentoo-grub.pl
