@@ -68,6 +68,10 @@ my $variables = gestion_arguments(
 				'usage' => 'supprime une sauvegarde dans le dépôt sélectionné',
 				'type'  => 's',
 			},
+			'detruit' => {
+				'alias' => 'S',
+				'usage' => 'détruit le dépôt entier.',
+			},
 			'prune' => {
 				'alias' => 'p',
 				'usage' =>
@@ -240,7 +244,66 @@ if ( $variables->{'supprime'} ) {
 
 		exit 0;
 	}
+}
 
+if ( $variables->{'detruit'} ) {
+
+	if ( defined( $variables->{'depot'} ) ) {
+
+		my $depot = $variables->{'depot'};
+
+		# Vérifier l'existance de la configuration du dépôt en question
+		if ( not exists( $depots->{$depot} ) ) {
+
+			journaliser( 'Le dépôt ' . $depot . ' est inconnu.' );
+
+		} else {
+
+			if ( defined( $depots->{$depot}->{'nom'} )
+				and ( $depots->{$depot}->{'nom'} ne '' ) ) {
+
+				journaliser( 'Destruction du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
+
+			} else {
+
+				croak 'le nom du dépôt n\'est pas défini.';
+			}
+
+			# Construction de la commande borg à utiliser pour le dépôt sélectionné
+			my $commande_borg = 'borg delete';
+
+			if ( defined( $depots->{$depot}->{'chemin'} )
+				and ( $depots->{$depot}->{'chemin'} ne '' ) ) {
+
+				$commande_borg = 'export BORG_REPO=' . $depots->{$depot}->{'chemin'} . '; ' . $commande_borg;
+
+			} else {
+
+				croak 'le chemin du dépôt n\'est pas défini.';
+			}
+
+			if ( defined($source_passphrase)
+				and ( $source_passphrase ne '' ) ) {
+
+				$commande_borg = $source_passphrase . '; ' . $commande_borg;
+
+			} else {
+
+				croak 'le chemin de la passphrase à sourcer n\'est pas défini.';
+			}
+
+			# Lancer la commande borg
+			#journaliser( $commande_borg );
+			system $commande_borg;
+		}
+		exit 0;
+
+	} else {
+
+		journaliser('Aucun dépôt précisé.');
+
+		exit 0;
+	}
 }
 
 # Sélection des différents dépôts à sauvegarder et/ou à réduire
