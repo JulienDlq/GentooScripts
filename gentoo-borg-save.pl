@@ -42,8 +42,10 @@ verification_admin();
 my $variables = gestion_arguments(
 	{
 		# Usage général
-		'usage_general' => 'Usage : ' . $NOM_DU_SCRIPT . ' [--depot <nom du dépot>] [--liste|--supprime|--prune]',
-		'usage_ordre'   => [ 'depot', 'liste', 'supprime', 'prune', ],
+		'usage_general' => 'Usage : '
+		  . $NOM_DU_SCRIPT
+		  . ' [--depot <nom du dépot>] [--liste|--cree|--supprime|--prune]',
+		'usage_ordre' => [ 'depot', 'liste', 'cree', 'supprime', 'prune', ],
 
 		# Arguments et usage spécifique
 		'arguments' => {
@@ -56,6 +58,10 @@ my $variables = gestion_arguments(
 				'alias' => 'l',
 				'usage' =>
 				  'lister les dépôts disponibles ou lister les sauvegarde d\'un dépôt s\'il est précisé.',
+			},
+			'cree' => {
+				'alias' => 'c',
+				'usage' => 'créer le dépôt configuré dans le fichier de configuration s\'il n\'existe pas.',
 			},
 			'supprime' => {
 				'alias' => 's',
@@ -120,6 +126,60 @@ if ( $variables->{'liste'} ) {
 		foreach my $depot (@liste_depots) {
 			say $depot;
 		}
+
+		exit 0;
+	}
+
+}
+
+if ( $variables->{'cree'} ) {
+
+	if ( defined( $variables->{'depot'} ) ) {
+
+		my $depot = $variables->{'depot'};
+
+		# Vérifier l'existance de la configuration du dépôt en question
+		if ( not exists( $depots->{$depot} ) ) {
+			journaliser( 'Le dépôt ' . $depot . ' est inconnu.' );
+		} else {
+
+			if ( defined( $depots->{$depot}->{'nom'} )
+				and ( $depots->{$depot}->{'nom'} ne '' ) ) {
+				journaliser( 'Création du dépôt '
+					  . $depots->{$depot}->{'nom'}
+					  . '.' );
+			} else {
+				croak 'le nom du dépôt n\'est pas défini.';
+			}
+
+			# Construction de la commande borg à utiliser pour le dépôt sélectionné
+			my $commande_borg = 'borg init -e repokey ';
+
+			if ( defined( $depots->{$depot}->{'chemin'} )
+				and ( $depots->{$depot}->{'chemin'} ne '' ) ) {
+				$commande_borg =
+					'export BORG_REPO='
+				  . $depots->{$depot}->{'chemin'} . '; '
+				  . $commande_borg;
+			} else {
+				croak 'le chemin du dépôt n\'est pas défini.';
+			}
+
+			if ( defined($source_passphrase)
+				and ( $source_passphrase ne '' ) ) {
+				$commande_borg = $source_passphrase . '; ' . $commande_borg;
+			} else {
+				croak 'le chemin de la passphrase à sourcer n\'est pas défini.';
+			}
+
+			# Lancer la commande borg
+			#journaliser( $commande_borg );
+			system $commande_borg;
+		}
+		exit 0;
+	} else {
+
+		journaliser('Aucun dépôt précisé.');
 
 		exit 0;
 	}
