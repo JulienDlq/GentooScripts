@@ -74,8 +74,7 @@ my $variables = gestion_arguments(
 			},
 			'prune' => {
 				'alias' => 'p',
-				'usage' =>
-				  'faire de la place dans le dépôt sélectionné ou dans tous les dépôts disponibles.',
+				'usage' => 'faire de la place dans le dépôt sélectionné ou dans tous les dépôts disponibles.',
 			},
 		},
 	},
@@ -149,9 +148,7 @@ if ( $variables->{'cree'} ) {
 
 			if ( defined( $depots->{$depot}->{'nom'} )
 				and ( $depots->{$depot}->{'nom'} ne '' ) ) {
-				journaliser( 'Création du dépôt '
-					  . $depots->{$depot}->{'nom'}
-					  . '.' );
+				journaliser( 'Création du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
 			} else {
 				croak 'le nom du dépôt n\'est pas défini.';
 			}
@@ -161,10 +158,7 @@ if ( $variables->{'cree'} ) {
 
 			if ( defined( $depots->{$depot}->{'chemin'} )
 				and ( $depots->{$depot}->{'chemin'} ne '' ) ) {
-				$commande_borg =
-					'export BORG_REPO='
-				  . $depots->{$depot}->{'chemin'} . '; '
-				  . $commande_borg;
+				$commande_borg = 'export BORG_REPO=' . $depots->{$depot}->{'chemin'} . '; ' . $commande_borg;
 			} else {
 				croak 'le chemin du dépôt n\'est pas défini.';
 			}
