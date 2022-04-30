@@ -231,13 +231,13 @@ case $1 in
 -sync)
   # Toute la suite va nécessiter des droits d'admin
   verificationAdmin
-	lancer ${LS['FONCTION']} "${LS['COMMANDE']}" true
+#	lancer ${LS['FONCTION']} "${LS['COMMANDE']}" true
 	lancer ${ES['FONCTION']} "${ES['COMMANDE']}" true
 ;;
 -synconly)
   # Toute la suite va nécessiter des droits d'admin
   verificationAdmin
-	lancer ${LS['FONCTION']} "${LS['COMMANDE']}" true
+#	lancer ${LS['FONCTION']} "${LS['COMMANDE']}" true
 	lancer ${ES['FONCTION']} "${ES['COMMANDE']}" true
 	exit 0
 ;;
