@@ -59,11 +59,6 @@ LISTEDEMAJ=(
 	ED
 )
 
-declare -A LS
-LS=(
-	['FONCTION']="LAYMAN::SYNC"
-	['COMMANDE']="layman $VERBOSE -S"
-)
 declare -A ES
 ES=(
 	['FONCTION']="PORTAGE::SYNC"
