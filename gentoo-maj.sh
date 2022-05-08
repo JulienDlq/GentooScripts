@@ -62,7 +62,7 @@ LISTEDEMAJ=(
 declare -A ES
 ES=(
 	['FONCTION']="PORTAGE::SYNC"
-	['COMMANDE']="eix-sync"
+	['COMMANDE']="emaint -a sync"
 )
 declare -A EUC
 EUC=(
