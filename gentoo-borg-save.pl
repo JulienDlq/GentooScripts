@@ -37,6 +37,8 @@ use GentooScripts::Core;
 require './gentoo-borg-save-config.pl';
 our ( @liste_depots, $disque_sauvegarde, $depots_borgbackup, $nom_de_sauvegarde, $depots, $prune, );
 
+my $source_passphrase = '. ./gentoo-borg-save-secret';
+
 ###
 # Toute la suite va nécessiter des droits d'admin
 
@@ -50,8 +52,8 @@ my $variables = gestion_arguments(
 		# Usage général
 		'usage_general' => 'Usage : '
 		  . $NOM_DU_SCRIPT
-		  . ' [--depot <nom du dépot>] [--liste|--cree|--supprime|--prune]',
-		'usage_ordre' => [ 'depot', 'liste', 'cree', 'supprime', 'prune', ],
+		. ' [--depot <nom du dépot>] <--liste|--cree|--detruit|--sauvegarde|--supprime|--prune>',
+		'usage_ordre' => [ 'depot', 'liste', 'cree', 'detruit', 'sauvegarde', 'supprime', 'prune', ],
 
 		# Arguments et usage spécifique
 		'arguments' => {
@@ -59,24 +61,28 @@ my $variables = gestion_arguments(
 				'alias' => 'd',
 				'usage' => 'préciser quel dépôt doit être considéré.',
 				'type'  => 's',
-			},
+			  },
 			'liste' => {
 				'alias' => 'l',
 				'usage' =>
 				  'lister les dépôts disponibles ou lister les sauvegarde d\'un dépôt s\'il est précisé.',
 			},
 			'cree' => {
-				'alias' => 'c',
-				'usage' => 'créer le dépôt configuré dans le fichier de configuration s\'il n\'existe pas.',
-			},
-			'supprime' => {
-				'alias' => 's',
-				'usage' => 'supprime une sauvegarde dans le dépôt sélectionné',
-				'type'  => 's',
+				'alias' => 'C',
+				'usage' => 'créer le dépôt sélectionné s\'il est configuré dans le fichier de configuration.',
 			},
 			'detruit' => {
 				'alias' => 'S',
-				'usage' => 'détruit le dépôt entier.',
+				'usage' => 'détruit le dépôt sélectionné en entier.',
+			},
+			'sauvegarde' => {
+				'alias' => 'c',
+				'usage' => 'créer une sauvegarde dans le dépôt sélectionné.',
+			},
+			'supprime' => {
+				'alias' => 's',
+				'usage' => 'supprime une sauvegarde dans le dépôt sélectionné.',
+				'type'  => 's',
 			},
 			'prune' => {
 				'alias' => 'p',
@@ -87,358 +93,205 @@ my $variables = gestion_arguments(
 );
 
 ###
-# Lancement du programme principal
+# Routines
 
-my $source_passphrase = '. ./gentoo-borg-save-secret';
+sub verification_existance_depot {
 
-if ( $variables->{'liste'} ) {
+	my ($parametres) = @_;
+	my $depot        = $parametres->{'depot'};
+	my $creation     = $parametres->{'creation'} // 0;
+
+	if ( not exists( $depots->{$depot} ) ) {
+		journaliser( 'Le dépôt ' . $depot . ' est inconnu dans la configuration.' );
+		exit 0;
+	}
+
+	if ( ( not $creation ) and ( not -d $depots->{$depot}->{'chemin'} ) ) {
+		journaliser( 'Le dépôt ' . $depot . ' n\'existe pas dans ' . $depots_borgbackup . '.' );
+		exit 0;
+	}
+
+	if ( ( $creation ) and ( -d $depots->{$depot}->{'chemin'} ) ) {
+		journaliser( 'Le dépôt ' . $depot . ' existe déjà dans ' . $depots_borgbackup . '.' );
+		exit 0;
+	}
+}
+
+sub verification_coherence_depot {
+
+	my ($depot) = @_;
+
+	if ( not defined($source_passphrase)
+		or ( $source_passphrase eq '' ) ) {
+
+		journaliser('le chemin de la passphrase à sourcer n\'est pas défini.');
+		exit 0;
+	}
+
+	if ( not defined( $depots->{$depot}->{'nom'} )
+		or ( $depots->{$depot}->{'nom'} eq '' ) ) {
+
+		journaliser('le nom du dépôt n\'est pas défini.');
+		exit 0;
+	}
+
+	if ( not defined( $depots->{$depot}->{'chemin'} )
+		or ( $depots->{$depot}->{'chemin'} eq '' ) ) {
+
+		journaliser('le chemin du dépôt n\'est pas défini.');
+		exit 0;
+	}
+
+	if ( not exists( $depots->{$depot}->{'elements_a_sauver'} )
+		or ( @{ $depots->{$depot}->{'elements_a_sauver'} } <= 0 ) ) {
+
+		journaliser('les éléments à sauver sont inexistants.');
+		exit 0;
+	}
+
+	if ( not defined($nom_de_sauvegarde)
+		or ( $nom_de_sauvegarde eq '' ) ) {
+
+		journaliser('le nom de la sauvegarde n\'est pas précisé');
+		exit 0;
+	}
+}
+
+sub lister_depots {
 
 	if ( defined( $variables->{'depot'} ) ) {
 
 		my $depot = $variables->{'depot'};
 
-		# Vérifier l'existance de la configuration du dépôt en question
-		if ( not exists( $depots->{$depot} ) ) {
-			journaliser( 'Le dépôt ' . $depot . ' est inconnu.' );
-		} else {
+		# Le code s'arrête si le dépot en question n'existe pas
+		verification_existance_depot( { 'depot' => $depot, } );
 
-			if ( defined( $depots->{$depot}->{'nom'} )
-				and ( $depots->{$depot}->{'nom'} ne '' ) ) {
-				journaliser( 'Liste des sauvegardes du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
-			} else {
-				croak 'le nom du dépôt n\'est pas défini.';
-			}
+		# Le code s'arrête si le dépot en question n'est pas cohérent
+		verification_coherence_depot($depot);
 
-			# Construction de la commande borg à utiliser pour le dépôt sélectionné
-			my $commande_borg = 'borg list';
+		journaliser( 'Liste des sauvegardes du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
 
-			if ( defined( $depots->{$depot}->{'chemin'} )
-				and ( $depots->{$depot}->{'chemin'} ne '' ) ) {
-				$commande_borg = 'export BORG_REPO=' . $depots->{$depot}->{'chemin'} . '; ' . $commande_borg;
-			} else {
-				croak 'le chemin du dépôt n\'est pas défini.';
-			}
+		# Lancer la commande borg
+		my $prefixe_commande = $source_passphrase . '; export BORG_REPO=' . $depots->{$depot}->{'chemin'};
+		system $prefixe_commande . '; borg list';
 
-			if ( defined($source_passphrase)
-				and ( $source_passphrase ne '' ) ) {
-				$commande_borg = $source_passphrase . '; ' . $commande_borg;
-			} else {
-				croak 'le chemin de la passphrase à sourcer n\'est pas défini.';
-			}
-
-			# Lancer la commande borg
-			#journaliser( $commande_borg );
-			system $commande_borg;
-		}
-		exit 0;
 	} else {
+
+		journaliser( 'Liste des dépôts.' );
+
 		foreach my $depot (@liste_depots) {
 			say $depot;
 		}
-
-		exit 0;
 	}
 
+	exit 0;
 }
 
-if ( $variables->{'cree'} ) {
+sub creer_depots {
 
 	if ( defined( $variables->{'depot'} ) ) {
 
 		my $depot = $variables->{'depot'};
 
-		# Vérifier l'existance de la configuration du dépôt en question
-		if ( not exists( $depots->{$depot} ) ) {
-			journaliser( 'Le dépôt ' . $depot . ' est inconnu.' );
-		} else {
+		# Le code s'arrête si le dépot en question n'existe pas
+		verification_existance_depot( {
+			'depot'    => $depot,
+			'creation' => 1
+		} );
 
-			if ( defined( $depots->{$depot}->{'nom'} )
-				and ( $depots->{$depot}->{'nom'} ne '' ) ) {
-				journaliser( 'Création du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
-			} else {
-				croak 'le nom du dépôt n\'est pas défini.';
-			}
+		# Le code s'arrête si le dépot en question n'est pas cohérent
+		verification_coherence_depot($depot);
 
-			# Construction de la commande borg à utiliser pour le dépôt sélectionné
-			my $commande_borg = 'borg init -e repokey ';
+		journaliser( 'Création du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
 
-			if ( defined( $depots->{$depot}->{'chemin'} )
-				and ( $depots->{$depot}->{'chemin'} ne '' ) ) {
-				$commande_borg = 'export BORG_REPO=' . $depots->{$depot}->{'chemin'} . '; ' . $commande_borg;
-			} else {
-				croak 'le chemin du dépôt n\'est pas défini.';
-			}
+		# Lancer la commande borg
+		my $prefixe_commande = $source_passphrase . '; export BORG_REPO=' . $depots->{$depot}->{'chemin'};
+		system $prefixe_commande . '; borg init -e repokey';
 
-			if ( defined($source_passphrase)
-				and ( $source_passphrase ne '' ) ) {
-				$commande_borg = $source_passphrase . '; ' . $commande_borg;
-			} else {
-				croak 'le chemin de la passphrase à sourcer n\'est pas défini.';
-			}
-
-			# Lancer la commande borg
-			#journaliser( $commande_borg );
-			system $commande_borg;
-		}
-		exit 0;
 	} else {
 
 		journaliser('Aucun dépôt précisé.');
-
-		exit 0;
 	}
 
+	exit 0;
 }
 
-if ( $variables->{'supprime'} ) {
+sub detruit_depots {
 
 	if ( defined( $variables->{'depot'} ) ) {
 
 		my $depot = $variables->{'depot'};
 
-		# Vérifier l'existance de la configuration du dépôt en question
-		if ( not exists( $depots->{$depot} ) ) {
-			journaliser( 'Le dépôt ' . $depot . ' est inconnu.' );
-		} else {
+		# Le code s'arrête si le dépot en question n'existe pas
+		verification_existance_depot( { 'depot' => $depot, } );
 
-			if ( defined( $depots->{$depot}->{'nom'} )
-				and ( $depots->{$depot}->{'nom'} ne '' ) ) {
-				journaliser( 'Suppression de la sauvegarde '
-					  . $variables->{'supprime'}
-					  . ' du dépôt '
-					  . $depots->{$depot}->{'nom'}
-					  . '.' );
-			} else {
-				croak 'le nom du dépôt n\'est pas défini.';
-			}
+		# Le code s'arrête si le dépot en question n'est pas cohérent
+		verification_coherence_depot($depot);
 
-			# Construction de la commande borg à utiliser pour le dépôt sélectionné
-			my $commande_borg = 'borg delete';
+		journaliser( 'Destruction du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
 
-			if ( defined( $depots->{$depot}->{'chemin'} )
-				and ( $depots->{$depot}->{'chemin'} ne '' ) ) {
-				$commande_borg =
-					'export BORG_REPO='
-				  . $depots->{$depot}->{'chemin'} . '; '
-				  . $commande_borg . ' ::'
-				  . $variables->{'supprime'};
-			} else {
-				croak 'le chemin du dépôt n\'est pas défini.';
-			}
+		# Lancer la commande borg
+		my $prefixe_commande = $source_passphrase . '; export BORG_REPO=' . $depots->{$depot}->{'chemin'};
+		system $prefixe_commande . '; borg delete';
 
-			if ( defined($source_passphrase)
-				and ( $source_passphrase ne '' ) ) {
-				$commande_borg = $source_passphrase . '; ' . $commande_borg;
-			} else {
-				croak 'le chemin de la passphrase à sourcer n\'est pas défini.';
-			}
-
-			# Lancer la commande borg
-			#journaliser( $commande_borg );
-			system $commande_borg;
-		}
-		exit 0;
 	} else {
 
 		journaliser('Aucun dépôt précisé.');
-
-		exit 0;
 	}
+
+	exit 0;
 }
 
-if ( $variables->{'detruit'} ) {
+sub supprime_sauvegardes {
 
 	if ( defined( $variables->{'depot'} ) ) {
 
 		my $depot = $variables->{'depot'};
 
-		# Vérifier l'existance de la configuration du dépôt en question
-		if ( not exists( $depots->{$depot} ) ) {
+		# Le code s'arrête si le dépot en question n'existe pas
+		verification_existance_depot( { 'depot' => $depot, } );
 
-			journaliser( 'Le dépôt ' . $depot . ' est inconnu.' );
+		# Le code s'arrête si le dépot en question n'est pas cohérent
+		verification_coherence_depot($depot);
 
-		} else {
+		journaliser( 'Suppression de la sauvegarde ' . $variables->{'supprime'} . ' du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
 
-			if ( defined( $depots->{$depot}->{'nom'} )
-				and ( $depots->{$depot}->{'nom'} ne '' ) ) {
-
-				journaliser( 'Destruction du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
-
-			} else {
-
-				croak 'le nom du dépôt n\'est pas défini.';
-			}
-
-			# Construction de la commande borg à utiliser pour le dépôt sélectionné
-			my $commande_borg = 'borg delete';
-
-			if ( defined( $depots->{$depot}->{'chemin'} )
-				and ( $depots->{$depot}->{'chemin'} ne '' ) ) {
-
-				$commande_borg = 'export BORG_REPO=' . $depots->{$depot}->{'chemin'} . '; ' . $commande_borg;
-
-			} else {
-
-				croak 'le chemin du dépôt n\'est pas défini.';
-			}
-
-			if ( defined($source_passphrase)
-				and ( $source_passphrase ne '' ) ) {
-
-				$commande_borg = $source_passphrase . '; ' . $commande_borg;
-
-			} else {
-
-				croak 'le chemin de la passphrase à sourcer n\'est pas défini.';
-			}
-
-			# Lancer la commande borg
-			#journaliser( $commande_borg );
-			system $commande_borg;
-		}
-		exit 0;
+		# Lancer la commande borg
+		my $prefixe_commande = $source_passphrase . ' ; export BORG_REPO=' . $depots->{$depot}->{'chemin'};
+		system $prefixe_commande . '; borg delete ::' . $variables->{'supprime'};
 
 	} else {
 
 		journaliser('Aucun dépôt précisé.');
+	}
 
-		exit 0;
+	exit 0;
+}
+
+sub selectionner_depots {
+
+	if ( defined( $variables->{'depot'} ) ) {
+		@liste_depots = ( $variables->{'depot'} );
 	}
 }
 
-# Sélection des différents dépôts à sauvegarder et/ou à réduire
-if ( defined( $variables->{'depot'} ) ) {
-	@liste_depots = ( $variables->{'depot'} );
-}
+sub prune_depots {
 
-# Parcours des différents dépôts à sauvegarder
-if ( not $variables->{'prune'} ) {
-
+	# Parcours des différents dépôts à réduire
 	foreach my $depot (@liste_depots) {
 
-		# Vérifier l'existance de la configuration du dépôt en question
-		if ( not exists( $depots->{$depot} ) ) {
-			journaliser( 'Le dépôt ' . $depot . ' est inconnu.' );
-		} else {
+		# Le code s'arrête si le dépot en question n'existe pas
+		verification_existance_depot( { 'depot' => $depot, } );
 
-			if ( defined( $depots->{$depot}->{'nom'} )
-				and ( $depots->{$depot}->{'nom'} ne '' ) ) {
-				journaliser( 'Sauvegarde du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
-			} else {
-				croak 'le nom du dépôt n\'est pas défini.';
-			}
+		# Le code s'arrête si le dépot en question n'est pas cohérent
+		verification_coherence_depot($depot);
 
-			# Construction de la commande borg à utiliser pour le dépôt sélectionné
-			my $commande_borg = 'borg create';
+		journaliser( 'Réduction du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
 
-			if ( exists( $depots->{$depot}->{'verbose'} ) ) {
-				$commande_borg .=
-				  ( $depots->{$depot}->{'verbose'} ? ' --verbose' : '' );
-			}
-
-			if ( exists( $depots->{$depot}->{'stats'} ) ) {
-				$commande_borg .=
-				  ( $depots->{$depot}->{'stats'} ? ' --stats' : '' );
-			}
-
-			if ( exists( $depots->{$depot}->{'progress'} ) ) {
-				$commande_borg .=
-				  ( $depots->{$depot}->{'progress'} ? ' --progress' : '' );
-			}
-
-			if ( exists( $depots->{$depot}->{'one_file_system'} ) ) {
-				$commande_borg .= (
-					$depots->{$depot}->{'one_file_system'}
-					? ' --one-file-system'
-					: ''
-				);
-			}
-
-			if ( exists( $depots->{$depot}->{'compression'} ) ) {
-				$commande_borg .= (
-					$depots->{$depot}->{'compression'}
-					? ' --compression ' . $depots->{$depot}->{'compression'}
-					: ''
-				);
-			}
-
-			if ( exists( $depots->{$depot}->{'exclude_caches'} ) ) {
-				$commande_borg .= (
-					$depots->{$depot}->{'exclude_caches'}
-					? ' --exclude-caches'
-					: ''
-				);
-			}
-
-			if ( exists( $depots->{$depot}->{'exclude'} ) ) {
-				$commande_borg .= (
-					$depots->{$depot}->{'exclude'}
-					? ' --exclude \'' . $depots->{$depot}->{'exclude'} . '\''
-					: ''
-				);
-			}
-
-			if ( defined($nom_de_sauvegarde)
-				and ( $nom_de_sauvegarde ne '' ) ) {
-				$commande_borg .= ' ::' . $nom_de_sauvegarde;
-			} else {
-				croak 'le nom de la sauvegarde n\'est pas précisé';
-			}
-
-			if ( exists( $depots->{$depot}->{'elements_a_sauver'} )
-				and ( @{ $depots->{$depot}->{'elements_a_sauver'} } > 0 ) ) {
-
-				my $liste_elements = '';
-
-				foreach my $element_courant ( @{ $depots->{$depot}->{'elements_a_sauver'} } ) {
-					$liste_elements .= ' ' . $element_courant;
-				}
-
-				$commande_borg .= $liste_elements;
-
-			} else {
-				croak 'les éléments à sauver sont inexistants.';
-			}
-
-			if ( defined( $depots->{$depot}->{'chemin'} )
-				and ( $depots->{$depot}->{'chemin'} ne '' ) ) {
-				$commande_borg = 'export BORG_REPO=' . $depots->{$depot}->{'chemin'} . '; ' . $commande_borg;
-			} else {
-				croak 'le chemin du dépôt n\'est pas défini.';
-			}
-
-			if ( defined($source_passphrase)
-				and ( $source_passphrase ne '' ) ) {
-				$commande_borg = $source_passphrase . '; ' . $commande_borg;
-			} else {
-				croak 'le chemin de la passphrase à sourcer n\'est pas défini.';
-			}
-
-			# Lancer la commande borg
-			#journaliser( $commande_borg );
-			system $commande_borg;
-		}
-	}
-}
-
-# Parcours des différents dépôts à réduire
-foreach my $depot (@liste_depots) {
-
-	# Vérifier l'existance de la configuration du dépôt en question
-	if ( not exists( $depots->{$depot} ) ) {
-		journaliser( 'Le dépôt ' . $depot . ' est inconnu.' );
-	} else {
-
-		if ( defined( $depots->{$depot}->{'nom'} )
-			and ( $depots->{$depot}->{'nom'} ne '' ) ) {
-			journaliser( 'Réduction du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
-		} else {
-			croak 'le nom du dépôt n\'est pas défini.';
-		}
-
-		# Construction de la commande borg à utiliser pour le dépôt sélectionné
-		my $commande_borg =
-			'borg prune -v'
+		# Lancer la commande borg
+		my $prefixe_commande = $source_passphrase . '; export BORG_REPO=' . $depots->{$depot}->{'chemin'};
+		system $prefixe_commande
+		  . '; borg prune -v'
 		  . ' --list'
 		  . ' --stats'
 		  . ' --keep-hourly='
@@ -451,26 +304,105 @@ foreach my $depot (@liste_depots) {
 		  . ( $prune->{'monthly'} // 1 )
 		  . ' --keep-yearly='
 		  . ( $prune->{'yearly'} // 1 );
+	}
 
-		if ( defined( $depots->{$depot}->{'chemin'} )
-			and ( $depots->{$depot}->{'chemin'} ne '' ) ) {
-			$commande_borg = 'export BORG_REPO=' . $depots->{$depot}->{'chemin'} . '; ' . $commande_borg;
-		} else {
-			croak 'le chemin du dépôt n\'est pas défini.';
+	exit 0;
+}
+
+sub sauvegarde_depots {
+
+	# Parcours des différents dépôts à sauvegarder
+	foreach my $depot (@liste_depots) {
+
+		# Le code s'arrête si le dépot en question n'existe pas
+		verification_existance_depot( { 'depot' => $depot, } );
+
+		# Le code s'arrête si le dépot en question n'est pas cohérent
+		verification_coherence_depot($depot);
+
+		journaliser( 'Sauvegarde du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
+
+		# Construction de la commande borg à utiliser pour le dépôt sélectionné
+		my $commande_borg = 'borg create';
+
+		if ( exists( $depots->{$depot}->{'verbose'} ) ) {
+			$commande_borg .=
+			  ( $depots->{$depot}->{'verbose'} ? ' --verbose' : '' );
 		}
 
-		if ( defined($source_passphrase)
-			and ( $source_passphrase ne '' ) ) {
-			$commande_borg = $source_passphrase . '; ' . $commande_borg;
-		} else {
-			croak 'le chemin de la passphrase à sourcer n\'est pas défini.';
+		if ( exists( $depots->{$depot}->{'stats'} ) ) {
+			$commande_borg .=
+			  ( $depots->{$depot}->{'stats'} ? ' --stats' : '' );
 		}
+
+		if ( exists( $depots->{$depot}->{'progress'} ) ) {
+			$commande_borg .=
+			  ( $depots->{$depot}->{'progress'} ? ' --progress' : '' );
+		}
+
+		if ( exists( $depots->{$depot}->{'one_file_system'} ) ) {
+			$commande_borg .= (
+				$depots->{$depot}->{'one_file_system'}
+				? ' --one-file-system'
+				: ''
+			);
+		}
+
+		if ( exists( $depots->{$depot}->{'compression'} ) ) {
+			$commande_borg .= (
+				$depots->{$depot}->{'compression'}
+				? ' --compression ' . $depots->{$depot}->{'compression'}
+				: ''
+			);
+		}
+
+		if ( exists( $depots->{$depot}->{'exclude_caches'} ) ) {
+			$commande_borg .= (
+				$depots->{$depot}->{'exclude_caches'}
+				? ' --exclude-caches'
+				: ''
+			);
+		}
+
+		if ( exists( $depots->{$depot}->{'exclude'} ) ) {
+			$commande_borg .= (
+				$depots->{$depot}->{'exclude'}
+				? ' --exclude \'' . $depots->{$depot}->{'exclude'} . '\''
+				: ''
+			);
+		}
+
+		$commande_borg .= ' ::' . $nom_de_sauvegarde;
+
+		my $liste_elements = '';
+		foreach my $element_courant ( @{ $depots->{$depot}->{'elements_a_sauver'} } ) {
+			$liste_elements .= ' ' . $element_courant;
+		}
+
+		$commande_borg .= $liste_elements;
 
 		# Lancer la commande borg
-		#journaliser( $commande_borg );
-		system $commande_borg;
+		my $prefixe_commande = $source_passphrase . '; export BORG_REPO=' . $depots->{$depot}->{'chemin'};
+		system $prefixe_commande . '; '. $commande_borg;
 	}
+
+	exit 0;
 }
+
+###
+# Lancement du programme principal
+
+lister_depots()        if ( $variables->{'liste'} );
+creer_depots()         if ( $variables->{'cree'} );
+detruit_depots()       if ( $variables->{'detruit'} );
+supprime_sauvegardes() if ( $variables->{'supprime'} );
+
+selectionner_depots();
+
+prune_depots()      if ( $variables->{'prune'} );
+sauvegarde_depots() if ( $variables->{'sauvegarde'} );
+
+GentooScripts::Core::usage();
 
 exit 0;
 
