@@ -142,9 +142,9 @@ function initialiseJournalScript
 	FONCTION=$1
 	JOURNAL="${JOURNAL['DOSSIER']}/${JOURNAL['DATE']}"
 	DATE="$(date +"%F %T")"
-  echo
+	echo
 	echo "$FONCTION"
-  echo
+	echo
 	echo "$DATE ($FONCTION) :: DEBUT" >> $JOURNAL
 }
 
@@ -153,7 +153,7 @@ function finaliseJournalScript
 	FONCTION=$1
 	JOURNAL="${JOURNAL['DOSSIER']}/${JOURNAL['DATE']}"
 	DATE="$(date +"%F %T")"
-  echo
+	echo
 	echo "$DATE ($FONCTION) :: FIN" >> $JOURNAL
 }
 
@@ -169,19 +169,19 @@ function messageJournalScript
 	elif [[ $RESULTAT -eq 1 && $FONCTION == ${EUC['FONCTION']} ]]
 	then
 		echo "$DATE ($FONCTION) :: ${MESSAGE['OK']}" >> $JOURNAL
-	  finaliseJournalScript "$FONCTION"
+		finaliseJournalScript "$FONCTION"
 	elif [[ $RESULTAT -eq 1 && $FONCTION != ${EUC['FONCTION']} ]]
 	then
-    echo
+		echo
 		echo "$FONCTION :: ${MESSAGE['KO']}"
-    echo
+		echo
 		echo "$DATE ($FONCTION) :: ${MESSAGE['KO']}" >> $JOURNAL
 		finaliseJournalScript "$FONCTION"
 		exit 1
 	else
-    echo
+		echo
 		echo "$FONCTION :: ${MESSAGE['FATAL']}"
-    echo
+		echo
 		echo "$DATE ($FONCTION) :: ${MESSAGE['FATAL']}" >> $JOURNAL
 		finaliseJournalScript "$FONCTION"
 		exit 2
@@ -200,23 +200,23 @@ function rafraichissementEnvironnement
 
 case $1 in
 -sync)
-  # Toute la suite va nécessiter des droits d'admin
-  verificationAdmin
+	# Toute la suite va nécessiter des droits d'admin
+	verificationAdmin
 	lancer ${ES['FONCTION']} "${ES['COMMANDE']}" true
 ;;
 -synconly)
-  # Toute la suite va nécessiter des droits d'admin
-  verificationAdmin
+	# Toute la suite va nécessiter des droits d'admin
+	verificationAdmin
 	lancer ${ES['FONCTION']} "${ES['COMMANDE']}" true
 	exit 0
 ;;
 -nosync)
-  # Toute la suite va nécessiter des droits d'admin
-  verificationAdmin
+	# Toute la suite va nécessiter des droits d'admin
+	verificationAdmin
 ;;
 -listupdate)
-  lancer ${EUC['FONCTION']} "${EUC['COMMANDE']}" false
-  exit 0
+	lancer ${EUC['FONCTION']} "${EUC['COMMANDE']}" false
+	exit 0
 ;;
 -listinstalled)
 	lancer ${EIC['FONCTION']} "${EIC['COMMANDE']}" false
