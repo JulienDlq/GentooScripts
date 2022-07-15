@@ -44,12 +44,8 @@ fi
 
 declare -a LISTE_DE_MAJ
 LISTEDEMAJ=(
-	ESU
-	ESUNU
 	ESUNUD
 	EPR
-	EWU
-	EWUNU
 	EWUNUD
 	EPR
 	EC
@@ -84,30 +80,10 @@ SEP=(
 	['FONCTION']="SYSTEM::UPDATE::PROFILE"
 	['COMMANDE']="source /etc/profile"
 )
-declare -A ESU
-ESU=(
-	['FONCTION']="PORTAGE::EMERGE::SYSTEM ( update )"
-	['COMMANDE']="emerge $VERBOSE $QUIET -u --with-bdeps=y @system"
-)
-declare -A ESUNU
-ESUNU=(
-	['FONCTION']="PORTAGE::EMERGE::SYSTEM ( update ; new use )"
-	['COMMANDE']="emerge $VERBOSE $QUIET -Nu --with-bdeps=y @system"
-)
 declare -A ESUNUD
 ESUNUD=(
 	['FONCTION']="PORTAGE::EMERGE::SYSTEM ( update ; new use ; deep )"
 	['COMMANDE']="emerge $VERBOSE $QUIET -NuD --with-bdeps=y @system"
-)
-declare -A EWU
-EWU=(
-	['FONCTION']="PORTAGE::EMERGE::WORLD ( update )"
-	['COMMANDE']="emerge $VERBOSE $QUIET -u --with-bdeps=y @world"
-)
-declare -A EWUNU
-EWUNU=(
-	['FONCTION']="PORTAGE::EMERGE::WORLD ( update ; new use )"
-	['COMMANDE']="emerge $VERBOSE $QUIET -Nu --with-bdeps=y @world"
 )
 declare -A EWUNUD
 EWUNUD=(
