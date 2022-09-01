@@ -18,12 +18,13 @@ my $CHEMIN_ABSOLUT_DU_SCRIPT;
 my $LIB;
 
 BEGIN {
-	$REPERTOIRE_DE_TRAVAIL    = getcwd();
-	$NOM_DU_SCRIPT            = basename($0);
-	$CHEMIN_DU_SCRIPT         = dirname($0);
-	$CHEMIN_ABSOLUT_DU_SCRIPT = $REPERTOIRE_DE_TRAVAIL . '/' . $CHEMIN_DU_SCRIPT;
-	chdir $CHEMIN_ABSOLUT_DU_SCRIPT;
-	$LIB = $CHEMIN_ABSOLUT_DU_SCRIPT . '/lib';
+	$NOM_DU_SCRIPT    = basename($0);
+	$CHEMIN_DU_SCRIPT = dirname($0);
+
+	chdir $CHEMIN_DU_SCRIPT;
+
+	$REPERTOIRE_DE_TRAVAIL = getcwd();
+	$LIB                   = $REPERTOIRE_DE_TRAVAIL . '/lib';
 }
 
 ###
