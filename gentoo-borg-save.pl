@@ -52,20 +52,34 @@ my $variables = gestion_arguments(
 		# Usage général
 		'usage_general' => 'Usage : '
 		  . $NOM_DU_SCRIPT
-		. ' [--depot <nom du dépot>] <--liste|--cree|--detruit|--sauvegarde|--supprime|--prune>',
-		'usage_ordre' => [ 'depot', 'liste', 'cree', 'detruit', 'sauvegarde', 'supprime', 'prune', ],
+		  . ' [--nom-depot <nom du dépot>] [--nom-sauvegarde <nom du dépot>] <--liste|--info|--cree|--detruit|--sauvegarde|--supprime|--prune>',
+		'usage_ordre' => [
+			'nom-depot',  'nom-sauvegarde', 'liste', 'info', 'cree', 'detruit',
+			'sauvegarde', 'supprime',       'prune',
+		],
 
 		# Arguments et usage spécifique
 		'arguments' => {
-			'depot' => {
+			'nom-depot' => {
 				'alias' => 'd',
 				'usage' => 'préciser quel dépôt doit être considéré.',
 				'type'  => 's',
-			  },
+			},
+			'nom-sauvegarde' => {
+				'alias' => 'D',
+				'usage' => 'préciser quelle sauvegarde doit être considéré.',
+				'type'  => 's',
+			},
 			'liste' => {
 				'alias' => 'l',
-				'usage' =>
-				  'lister les dépôts disponibles ou lister les sauvegarde d\'un dépôt s\'il est précisé.',
+				'usage' => 'lister les dépôts disponibles'
+				  . ' ou lister les sauvegardes d\'un dépôt s\'il est précisé'
+				  . ' ou lister le contenu d\'une sauvegarde si elle est précisée.',
+			},
+			'info' => {
+				'alias' => 'i',
+				'usage' => 'donne des informations sur un dépôt s\'il est précisé'
+				  . ' ou d\'une sauvegarde si elle est précisée.',
 			},
 			'cree' => {
 				'alias' => 'C',
@@ -98,7 +112,7 @@ my $variables = gestion_arguments(
 sub verification_existance_depot {
 
 	my ($parametres) = @_;
-	my $depot        = $parametres->{'depot'};
+	my $depot        = $parametres->{'nom-depot'};
 	my $creation     = $parametres->{'creation'} // 0;
 
 	if ( not exists( $depots->{$depot} ) ) {
@@ -111,7 +125,7 @@ sub verification_existance_depot {
 		exit 0;
 	}
 
-	if ( ( $creation ) and ( -d $depots->{$depot}->{'chemin'} ) ) {
+	if ( ($creation) and ( -d $depots->{$depot}->{'chemin'} ) ) {
 		journaliser( 'Le dépôt ' . $depot . ' existe déjà dans ' . $depots_borgbackup . '.' );
 		exit 0;
 	}
@@ -157,27 +171,39 @@ sub verification_coherence_depot {
 	}
 }
 
-sub lister_depots {
+sub lister {
 
-	if ( defined( $variables->{'depot'} ) ) {
+	if ( defined( $variables->{'nom-depot'} ) ) {
 
-		my $depot = $variables->{'depot'};
+		my $depot = $variables->{'nom-depot'};
 
 		# Le code s'arrête si le dépot en question n'existe pas
-		verification_existance_depot( { 'depot' => $depot, } );
+		verification_existance_depot( { 'nom-depot' => $depot, } );
 
 		# Le code s'arrête si le dépot en question n'est pas cohérent
 		verification_coherence_depot($depot);
 
-		journaliser( 'Liste des sauvegardes du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
+		my $sauvegarde;
+
+		if ( defined( $variables->{'nom-sauvegarde'} ) ) {
+
+			$sauvegarde = $variables->{'nom-sauvegarde'};
+
+			journaliser(
+				'Contenu de la sauvegarde ' . $sauvegarde . ' du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
+
+		} else {
+
+			journaliser( 'Liste des sauvegardes du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
+		}
 
 		# Lancer la commande borg
 		my $prefixe_commande = $source_passphrase . '; export BORG_REPO=' . $depots->{$depot}->{'chemin'};
-		system $prefixe_commande . '; borg list';
+		system $prefixe_commande . '; borg list' . ( defined($sauvegarde) ? ' ::' . $sauvegarde : '' );
 
 	} else {
 
-		journaliser( 'Liste des dépôts.' );
+		journaliser('Liste des dépôts.');
 
 		foreach my $depot (@liste_depots) {
 			say $depot;
@@ -187,16 +213,57 @@ sub lister_depots {
 	exit 0;
 }
 
+sub informer {
+
+	if ( defined( $variables->{'nom-depot'} ) ) {
+
+		my $depot = $variables->{'nom-depot'};
+
+		# Le code s'arrête si le dépot en question n'existe pas
+		verification_existance_depot( { 'nom-depot' => $depot, } );
+
+		# Le code s'arrête si le dépot en question n'est pas cohérent
+		verification_coherence_depot($depot);
+
+		my $sauvegarde;
+
+		if ( defined( $variables->{'nom-sauvegarde'} ) ) {
+
+			$sauvegarde = $variables->{'nom-sauvegarde'};
+
+			journaliser( 'Donne des infos sur la sauvegarde '
+				  . $sauvegarde
+				  . ' du dépôt '
+				  . $depots->{$depot}->{'nom'}
+				  . '.' );
+
+		} else {
+
+			journaliser( 'Donne des infos sur le dépôt ' . $depots->{$depot}->{'nom'} . '.' );
+		}
+
+		# Lancer la commande borg
+		my $prefixe_commande = $source_passphrase . '; export BORG_REPO=' . $depots->{$depot}->{'chemin'};
+		system $prefixe_commande . '; borg info' . ( defined($sauvegarde) ? ' ::' . $sauvegarde : '' );
+
+	} else {
+
+		journaliser('Aucun dépôt précisé.');
+	}
+
+	exit 0;
+}
+
 sub creer_depots {
 
-	if ( defined( $variables->{'depot'} ) ) {
+	if ( defined( $variables->{'nom-depot'} ) ) {
 
-		my $depot = $variables->{'depot'};
+		my $depot = $variables->{'nom-depot'};
 
 		# Le code s'arrête si le dépot en question n'existe pas
 		verification_existance_depot( {
-			'depot'    => $depot,
-			'creation' => 1
+			'nom-depot' => $depot,
+			'creation'  => 1
 		} );
 
 		# Le code s'arrête si le dépot en question n'est pas cohérent
@@ -218,12 +285,12 @@ sub creer_depots {
 
 sub detruit_depots {
 
-	if ( defined( $variables->{'depot'} ) ) {
+	if ( defined( $variables->{'nom-depot'} ) ) {
 
-		my $depot = $variables->{'depot'};
+		my $depot = $variables->{'nom-depot'};
 
 		# Le code s'arrête si le dépot en question n'existe pas
-		verification_existance_depot( { 'depot' => $depot, } );
+		verification_existance_depot( { 'nom-depot' => $depot, } );
 
 		# Le code s'arrête si le dépot en question n'est pas cohérent
 		verification_coherence_depot($depot);
@@ -244,17 +311,21 @@ sub detruit_depots {
 
 sub supprime_sauvegardes {
 
-	if ( defined( $variables->{'depot'} ) ) {
+	if ( defined( $variables->{'nom-depot'} ) ) {
 
-		my $depot = $variables->{'depot'};
+		my $depot = $variables->{'nom-depot'};
 
 		# Le code s'arrête si le dépot en question n'existe pas
-		verification_existance_depot( { 'depot' => $depot, } );
+		verification_existance_depot( { 'nom-depot' => $depot, } );
 
 		# Le code s'arrête si le dépot en question n'est pas cohérent
 		verification_coherence_depot($depot);
 
-		journaliser( 'Suppression de la sauvegarde ' . $variables->{'supprime'} . ' du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
+		journaliser( 'Suppression de la sauvegarde '
+			  . $variables->{'supprime'}
+			  . ' du dépôt '
+			  . $depots->{$depot}->{'nom'}
+			  . '.' );
 
 		# Lancer la commande borg
 		my $prefixe_commande = $source_passphrase . ' ; export BORG_REPO=' . $depots->{$depot}->{'chemin'};
@@ -270,8 +341,8 @@ sub supprime_sauvegardes {
 
 sub selectionner_depots {
 
-	if ( defined( $variables->{'depot'} ) ) {
-		@liste_depots = ( $variables->{'depot'} );
+	if ( defined( $variables->{'nom-depot'} ) ) {
+		@liste_depots = ( $variables->{'nom-depot'} );
 	}
 }
 
@@ -281,7 +352,7 @@ sub prune_depots {
 	foreach my $depot (@liste_depots) {
 
 		# Le code s'arrête si le dépot en question n'existe pas
-		verification_existance_depot( { 'depot' => $depot, } );
+		verification_existance_depot( { 'nom-depot' => $depot, } );
 
 		# Le code s'arrête si le dépot en question n'est pas cohérent
 		verification_coherence_depot($depot);
@@ -315,7 +386,7 @@ sub sauvegarde_depots {
 	foreach my $depot (@liste_depots) {
 
 		# Le code s'arrête si le dépot en question n'existe pas
-		verification_existance_depot( { 'depot' => $depot, } );
+		verification_existance_depot( { 'nom-depot' => $depot, } );
 
 		# Le code s'arrête si le dépot en question n'est pas cohérent
 		verification_coherence_depot($depot);
@@ -383,7 +454,7 @@ sub sauvegarde_depots {
 
 		# Lancer la commande borg
 		my $prefixe_commande = $source_passphrase . '; export BORG_REPO=' . $depots->{$depot}->{'chemin'};
-		system $prefixe_commande . '; '. $commande_borg;
+		system $prefixe_commande . '; ' . $commande_borg;
 	}
 
 	exit 0;
@@ -392,7 +463,8 @@ sub sauvegarde_depots {
 ###
 # Lancement du programme principal
 
-lister_depots()        if ( $variables->{'liste'} );
+lister()               if ( $variables->{'liste'} );
+informer()             if ( $variables->{'info'} );
 creer_depots()         if ( $variables->{'cree'} );
 detruit_depots()       if ( $variables->{'detruit'} );
 supprime_sauvegardes() if ( $variables->{'supprime'} );
@@ -405,4 +477,3 @@ sauvegarde_depots() if ( $variables->{'sauvegarde'} );
 GentooScripts::Core::usage();
 
 exit 0;
-
