@@ -52,10 +52,10 @@ my $variables = gestion_arguments(
 		# Usage général
 		'usage_general' => 'Usage : '
 		  . $NOM_DU_SCRIPT
-		  . ' [--nom-depot <nom du dépot>] [--nom-sauvegarde <nom du dépot>] <--liste|--info|--cree|--detruit|--sauvegarde|--supprime|--prune|--compacte>',
+		  . ' [--nom-depot <nom du dépot>] [--nom-sauvegarde <nom du dépot>] <--liste|--info|--cree|--detruit|--sauvegarde|--supprime|--prune|--compacte|--verifie|--repare>',
 		'usage_ordre' => [
-			'nom-depot',  'nom-sauvegarde', 'liste', 'info', 'cree', 'detruit',
-			'sauvegarde', 'supprime',       'prune', 'compacte',
+			'nom-depot',  'nom-sauvegarde', 'liste', 'info',     'cree',    'detruit',
+			'sauvegarde', 'supprime',       'prune', 'compacte', 'verifie', 'repare',
 		],
 
 		# Arguments et usage spécifique
@@ -105,6 +105,14 @@ my $variables = gestion_arguments(
 			'compacte' => {
 				'alias' => 'P',
 				'usage' => 'compacter le dépôt sélectionné ou tous les dépôts disponibles.',
+			},
+			'verifie' => {
+				'alias' => 'r',
+				'usage' => 'vérifie le dépôt sélectionné ou tous les dépôts disponibles.',
+			},
+			'repare' => {
+				'alias' => 'R',
+				'usage' => 'répare le dépôt sélectionné ou tous les dépôts disponibles.',
 			},
 		},
 	},
@@ -402,6 +410,44 @@ sub compacter_depots {
 		system $prefixe_commande
 		  . '; borg compact -v'
 		  . ' --progress';
+
+sub verifie_depots {
+
+	# Parcours des différents dépôts à réduire
+	foreach my $depot (@liste_depots) {
+
+		# Le code s'arrête si le dépot en question n'existe pas
+		verification_existance_depot( { 'nom-depot' => $depot, } );
+
+		# Le code s'arrête si le dépot en question n'est pas cohérent
+		verification_coherence_depot($depot);
+
+		journaliser( 'Vérification du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
+
+		# Lancer la commande borg
+		my $prefixe_commande = $source_passphrase . '; export BORG_REPO=' . $depots->{$depot}->{'chemin'};
+		system $prefixe_commande . '; borg check -v --progress';
+	}
+
+	exit 0;
+}
+
+sub repare_depots {
+
+	# Parcours des différents dépôts à réduire
+	foreach my $depot (@liste_depots) {
+
+		# Le code s'arrête si le dépot en question n'existe pas
+		verification_existance_depot( { 'nom-depot' => $depot, } );
+
+		# Le code s'arrête si le dépot en question n'est pas cohérent
+		verification_coherence_depot($depot);
+
+		journaliser( 'Répare du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
+
+		# Lancer la commande borg
+		my $prefixe_commande = $source_passphrase . '; export BORG_REPO=' . $depots->{$depot}->{'chemin'};
+		system $prefixe_commande . '; borg check -v --progress --verify-data --repair';
 	}
 
 	exit 0;
@@ -498,8 +544,12 @@ supprime_sauvegardes() if ( $variables->{'supprime'} );
 
 selectionner_depots();
 
-prune_depots()      if ( $variables->{'prune'} );
-compacter_depots()  if ( $variables->{'compacte'} );
+prune_depots()     if ( $variables->{'prune'} );
+compacter_depots() if ( $variables->{'compacte'} );
+
+verifie_depots() if ( $variables->{'verifie'} );
+repare_depots()  if ( $variables->{'repare'} );
+
 sauvegarde_depots() if ( $variables->{'sauvegarde'} );
 
 GentooScripts::Core::usage();
