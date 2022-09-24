@@ -52,10 +52,10 @@ my $variables = gestion_arguments(
 		# Usage général
 		'usage_general' => 'Usage : '
 		  . $NOM_DU_SCRIPT
-		  . ' [--nom-depot <nom du dépot>] [--nom-sauvegarde <nom du dépot>] <--liste|--info|--cree|--detruit|--sauvegarde|--supprime|--prune>',
+		  . ' [--nom-depot <nom du dépot>] [--nom-sauvegarde <nom du dépot>] <--liste|--info|--cree|--detruit|--sauvegarde|--supprime|--prune|--compact>',
 		'usage_ordre' => [
 			'nom-depot',  'nom-sauvegarde', 'liste', 'info', 'cree', 'detruit',
-			'sauvegarde', 'supprime',       'prune',
+			'sauvegarde', 'supprime',       'prune', 'compact',
 		],
 
 		# Arguments et usage spécifique
@@ -101,6 +101,10 @@ my $variables = gestion_arguments(
 			'prune' => {
 				'alias' => 'p',
 				'usage' => 'faire de la place dans le dépôt sélectionné ou dans tous les dépôts disponibles.',
+			},
+			'compact' => {
+				'alias' => 'P',
+				'usage' => 'compacter le dépôt sélectionné ou tous les dépôts disponibles.',
 			},
 		},
 	},
@@ -380,6 +384,29 @@ sub prune_depots {
 	exit 0;
 }
 
+sub compacter_depots {
+
+	# Parcours des différents dépôts à réduire
+	foreach my $depot (@liste_depots) {
+
+		# Le code s'arrête si le dépot en question n'existe pas
+		verification_existance_depot( { 'nom-depot' => $depot, } );
+
+		# Le code s'arrête si le dépot en question n'est pas cohérent
+		verification_coherence_depot($depot);
+
+		journaliser( 'Compression du dépôt ' . $depots->{$depot}->{'nom'} . '.' );
+
+		# Lancer la commande borg
+		my $prefixe_commande = $source_passphrase . '; export BORG_REPO=' . $depots->{$depot}->{'chemin'};
+		system $prefixe_commande
+		  . '; borg compact -v'
+		  . ' --progress';
+	}
+
+	exit 0;
+}
+
 sub sauvegarde_depots {
 
 	# Parcours des différents dépôts à sauvegarder
@@ -472,6 +499,7 @@ supprime_sauvegardes() if ( $variables->{'supprime'} );
 selectionner_depots();
 
 prune_depots()      if ( $variables->{'prune'} );
+compacter_depots()  if ( $variables->{'compact'} );
 sauvegarde_depots() if ( $variables->{'sauvegarde'} );
 
 GentooScripts::Core::usage();
