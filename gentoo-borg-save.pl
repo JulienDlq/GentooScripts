@@ -407,9 +407,11 @@ sub compacter_depots {
 
 		# Lancer la commande borg
 		my $prefixe_commande = $source_passphrase . '; export BORG_REPO=' . $depots->{$depot}->{'chemin'};
-		system $prefixe_commande
-		  . '; borg compact -v'
-		  . ' --progress';
+		system $prefixe_commande . '; borg compact -v --progress';
+	}
+
+	exit 0;
+}
 
 sub verifie_depots {
 
