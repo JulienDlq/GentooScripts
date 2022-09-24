@@ -52,10 +52,10 @@ my $variables = gestion_arguments(
 		# Usage général
 		'usage_general' => 'Usage : '
 		  . $NOM_DU_SCRIPT
-		  . ' [--nom-depot <nom du dépot>] [--nom-sauvegarde <nom du dépot>] <--liste|--info|--cree|--detruit|--sauvegarde|--supprime|--prune|--compact>',
+		  . ' [--nom-depot <nom du dépot>] [--nom-sauvegarde <nom du dépot>] <--liste|--info|--cree|--detruit|--sauvegarde|--supprime|--prune|--compacte>',
 		'usage_ordre' => [
 			'nom-depot',  'nom-sauvegarde', 'liste', 'info', 'cree', 'detruit',
-			'sauvegarde', 'supprime',       'prune', 'compact',
+			'sauvegarde', 'supprime',       'prune', 'compacte',
 		],
 
 		# Arguments et usage spécifique
@@ -102,7 +102,7 @@ my $variables = gestion_arguments(
 				'alias' => 'p',
 				'usage' => 'faire de la place dans le dépôt sélectionné ou dans tous les dépôts disponibles.',
 			},
-			'compact' => {
+			'compacte' => {
 				'alias' => 'P',
 				'usage' => 'compacter le dépôt sélectionné ou tous les dépôts disponibles.',
 			},
@@ -499,7 +499,7 @@ supprime_sauvegardes() if ( $variables->{'supprime'} );
 selectionner_depots();
 
 prune_depots()      if ( $variables->{'prune'} );
-compacter_depots()  if ( $variables->{'compact'} );
+compacter_depots()  if ( $variables->{'compacte'} );
 sauvegarde_depots() if ( $variables->{'sauvegarde'} );
 
 GentooScripts::Core::usage();
