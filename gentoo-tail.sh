@@ -28,7 +28,7 @@ do
 		if [[ ! -z "$compilation_en_cours" ]]
 		then
 			# Lancement du tail correspondant
-			( tail -F /var/tmp/portage/${compilation_en_cours}/temp/build.log ) &
+			( grc tail -F /var/tmp/portage/${compilation_en_cours}/temp/build.log ) &
 			# Récupération du PID
 			pid_tail=$!
 			# Rendre la compilation active

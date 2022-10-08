@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env zsh
 
 SCRIPTNAME=$(basename $0)
 SCRIPTPATH=$(dirname $0)
@@ -15,18 +15,22 @@ cd $SCRIPTPATH
 #----------
 
 
-declare -A MESSAGE
-MESSAGE=(
-	['OK']="Tout s'est bien passé. ;-)"
-	['KO']="Il y a eu un soucis... :-S"
-	['NA']="Il y n'y a pas de mise à jour à faire... :-O"
-	['FATAL']="Il y a eu une erreur fatale non gérée... x.x"
+typeset -A MESSAGE=(
+	'OK'
+	"Tout s'est bien passé. ;-)"
+	'KO'
+	"Il y a eu un soucis... :-S"
+	'NA'
+	"Il y n'y a pas de mise à jour à faire... :-O"
+	'FATAL'
+	"Il y a eu une erreur fatale non gérée... x.x"
 )
 
-declare -A JOURNAL
-JOURNAL=(
-	['DOSSIER']="/var/log/gentooscripts"
-	['DATE']=$(date +%F-%H%M%S).log
+typeset -A JOURNAL=(
+	'DOSSIER'
+	"/var/log/gentooscripts"
+	'DATE'
+	"$(date +%F-%H%M%S).log"
 )
 
 if [[ $SETVERBOSE -eq 1 ]]
@@ -42,8 +46,7 @@ else
 	QUIET="--quiet-build n"
 fi
 
-declare -a LISTE_DE_MAJ
-LISTEDEMAJ=(
+typeset -a LISTEDEMAJ=(
 	ESUNUD
 	EPR
 	EWUNUD
@@ -55,68 +58,80 @@ LISTEDEMAJ=(
 	ED
 )
 
-declare -A ES
-ES=(
-	['FONCTION']="PORTAGE::SYNC"
-	['COMMANDE']="emaint -a sync"
+typeset -A ES=(
+	'FONCTION'
+	"PORTAGE::SYNC"
+	'COMMANDE'
+	"emaint -a sync"
 )
-declare -A EUC
-EUC=(
-	  ['FONCTION']="PORTAGE::LIST::UPDATE"
-	  ['COMMANDE']="eix -u -c"
+typeset -A EUC=(
+	  'FONCTION'
+	  "PORTAGE::LIST::UPDATE"
+	  'COMMANDE'
+	  "eix -u -c"
 )
-declare -A EIC
-EIC=(
-	  ['FONCTION']="PORTAGE::LIST::INSTALLED"
-	  ['COMMANDE']="EIX_LIMIT_COMPACT=0 eix -I -c"
+typeset -A EIC=(
+	  'FONCTION'
+	  "PORTAGE::LIST::INSTALLED"
+	  'COMMANDE'
+	  "EIX_LIMIT_COMPACT=0 eix -I -c"
 )
-declare -A ENVU
-ENVU=(
-	['FONCTION']="SYSTEM::UPDATE::ENV"
-	['COMMANDE']="env-update"
+typeset -A ENVU=(
+	'FONCTION'
+	"SYSTEM::UPDATE::ENV"
+	'COMMANDE'
+	"env-update"
 )
-declare -A SEP
-SEP=(
-	['FONCTION']="SYSTEM::UPDATE::PROFILE"
-	['COMMANDE']="source /etc/profile"
+typeset -A SEP=(
+	'FONCTION'
+	"SYSTEM::UPDATE::PROFILE"
+	'COMMANDE'
+	"source /etc/profile"
 )
-declare -A ESUNUD
-ESUNUD=(
-	['FONCTION']="PORTAGE::EMERGE::SYSTEM ( update ; new use ; deep )"
-	['COMMANDE']="emerge $VERBOSE $QUIET -NuD --with-bdeps=y @system"
+typeset -A ESUNUD=(
+	'FONCTION'
+	"PORTAGE::EMERGE::SYSTEM ( update ; new use ; deep )"
+	'COMMANDE'
+	"emerge $VERBOSE $QUIET -NuD --with-bdeps=y @system"
 )
-declare -A EWUNUD
-EWUNUD=(
-	['FONCTION']="PORTAGE::EMERGE::WORLD ( update ; new use ; deep )"
-	['COMMANDE']="emerge $VERBOSE $QUIET -NuD --with-bdeps=y @world"
+typeset -A EWUNUD=(
+	'FONCTION'
+	"PORTAGE::EMERGE::WORLD ( update ; new use ; deep )"
+	'COMMANDE'
+	"emerge $VERBOSE $QUIET -NuD --with-bdeps=y @world"
 )
-declare -A EPR
-EPR=(
-	['FONCTION']="PORTAGE::EMERGE::PRESERVEDREBUILD"
-	['COMMANDE']="emerge $VERBOSE $QUIET @preserved-rebuild"
+typeset -A EPR=(
+	'FONCTION'
+	"PORTAGE::EMERGE::PRESERVEDREBUILD"
+	'COMMANDE'
+	"emerge $VERBOSE $QUIET @preserved-rebuild"
 )
-declare -A EC
-EC=(
-	['FONCTION']="PORTAGE::EMERGE::REMOVE::OBSOLETES"
-	['COMMANDE']="emerge $VERBOSE $QUIET -c"
+typeset -A EC=(
+	'FONCTION'
+	"PORTAGE::EMERGE::REMOVE::OBSOLETES"
+	'COMMANDE'
+	"emerge $VERBOSE $QUIET -c"
 )
-declare -A RR
-RR=(
-	['FONCTION']="PORTAGE::REBUILD::DEPENDENCIES"
-	['COMMANDE']="revdep-rebuild -- $VERBOSE $QUIET"
+typeset -A RR=(
+	'FONCTION'
+	"PORTAGE::REBUILD::DEPENDENCIES"
+	'COMMANDE'
+	"revdep-rebuild -- $VERBOSE $QUIET"
 )
-declare -A EU
-EU=(
-	['FONCTION']="PORTAGE::UPDATE::ETC"
-	['COMMANDE']="etc-update $VERBOSE"
+typeset -A EU=(
+	'FONCTION'
+	"PORTAGE::UPDATE::ETC"
+	'COMMANDE'
+	"etc-update $VERBOSE"
 )
-declare -A ED
-ED=(
-	['FONCTION']="PORTAGE::CLEAN::DISTFILES"
-	['COMMANDE']="eclean -v distfiles"
+typeset -A ED=(
+	'FONCTION'
+	"PORTAGE::CLEAN::DISTFILES"
+	'COMMANDE'
+	"eclean -v distfiles"
 )
 
-mkdir -p ${JOURNAL['DOSSIER']}
+mkdir -p ${JOURNAL[DOSSIER]}
 
 #----------
 # FONCTIONS
@@ -140,7 +155,7 @@ function lancer
 function initialiseJournalScript
 {
 	FONCTION=$1
-	JOURNAL="${JOURNAL['DOSSIER']}/${JOURNAL['DATE']}"
+	local JOURNAL="${JOURNAL[DOSSIER]}/${JOURNAL[DATE]}"
 	DATE="$(date +"%F %T")"
 	echo
 	echo "$FONCTION"
@@ -151,7 +166,7 @@ function initialiseJournalScript
 function finaliseJournalScript
 {
 	FONCTION=$1
-	JOURNAL="${JOURNAL['DOSSIER']}/${JOURNAL['DATE']}"
+	local JOURNAL="${JOURNAL[DOSSIER]}/${JOURNAL[DATE]}"
 	DATE="$(date +"%F %T")"
 	echo
 	echo "$DATE ($FONCTION) :: FIN" >> $JOURNAL
@@ -161,28 +176,28 @@ function messageJournalScript
 {
 	RESULTAT=$1
 	FONCTION=$2
-	JOURNAL="${JOURNAL['DOSSIER']}/${JOURNAL['DATE']}"
+	local JOURNAL="${JOURNAL[DOSSIER]}/${JOURNAL[DATE]}"
 	DATE="$(date +"%F %T")"
 	if [[ $RESULTAT -eq 0 ]]
 	then
-		echo "$DATE ($FONCTION) :: ${MESSAGE['OK']}" >> $JOURNAL
-	elif [[ $RESULTAT -eq 1 && $FONCTION == ${EUC['FONCTION']} ]]
+		echo "$DATE ($FONCTION) :: ${MESSAGE[OK]}" >> $JOURNAL
+	elif [[ $RESULTAT -eq 1 && $FONCTION == ${EUC[FONCTION]} ]]
 	then
-		echo "$DATE ($FONCTION) :: ${MESSAGE['OK']}" >> $JOURNAL
+		echo "$DATE ($FONCTION) :: ${MESSAGE[OK]}" >> $JOURNAL
 		finaliseJournalScript "$FONCTION"
-	elif [[ $RESULTAT -eq 1 && $FONCTION != ${EUC['FONCTION']} ]]
+	elif [[ $RESULTAT -eq 1 && $FONCTION != ${EUC[FONCTION]} ]]
 	then
 		echo
-		echo "$FONCTION :: ${MESSAGE['KO']}"
+		echo "$FONCTION :: ${MESSAGE[KO]}"
 		echo
-		echo "$DATE ($FONCTION) :: ${MESSAGE['KO']}" >> $JOURNAL
+		echo "$DATE ($FONCTION) :: ${MESSAGE[KO]}" >> $JOURNAL
 		finaliseJournalScript "$FONCTION"
 		exit 1
 	else
 		echo
-		echo "$FONCTION :: ${MESSAGE['FATAL']}"
+		echo "$FONCTION :: ${MESSAGE[FATAL]}"
 		echo
-		echo "$DATE ($FONCTION) :: ${MESSAGE['FATAL']}" >> $JOURNAL
+		echo "$DATE ($FONCTION) :: ${MESSAGE[FATAL]}" >> $JOURNAL
 		finaliseJournalScript "$FONCTION"
 		exit 2
 	fi
@@ -190,8 +205,8 @@ function messageJournalScript
 
 function rafraichissementEnvironnement
 {
-	lancer ${ENVU['FONCTION']} "${ENVU['COMMANDE']}" false
-	lancer ${SEP['FONCTION']} "${SEP['COMMANDE']}" false
+	lancer ${ENVU[FONCTION]} "${ENVU[COMMANDE]}" false
+	lancer ${SEP[FONCTION]} "${SEP[COMMANDE]}" false
 }
 
 #------------
@@ -202,12 +217,12 @@ case $1 in
 -sync)
 	# Toute la suite va nécessiter des droits d'admin
 	verificationAdmin
-	lancer ${ES['FONCTION']} "${ES['COMMANDE']}" true
+	lancer ${ES[FONCTION]} "${ES[COMMANDE]}" true
 ;;
 -synconly)
 	# Toute la suite va nécessiter des droits d'admin
 	verificationAdmin
-	lancer ${ES['FONCTION']} "${ES['COMMANDE']}" true
+	lancer ${ES[FONCTION]} "${ES[COMMANDE]}" true
 	exit 0
 ;;
 -nosync)
@@ -215,11 +230,11 @@ case $1 in
 	verificationAdmin
 ;;
 -listupdate)
-	lancer ${EUC['FONCTION']} "${EUC['COMMANDE']}" false
+	lancer ${EUC[FONCTION]} "${EUC[COMMANDE]}" false
 	exit 0
 ;;
 -listinstalled)
-	lancer ${EIC['FONCTION']} "${EIC['COMMANDE']}" false
+	lancer ${EIC[FONCTION]} "${EIC[COMMANDE]}" false
 	exit 0
 ;;
 *|"")
@@ -236,8 +251,8 @@ esac
 # Lancement des commandes de mise à jour présente dans la liste
 for i in "${LISTEDEMAJ[@]}"
 do
-	FONCTION_CONSTRUITE=\${$(echo $i)['FONCTION']}
-	COMMANDE_CONSTRUITE=\${$(echo $i)['COMMANDE']}
+	FONCTION_CONSTRUITE=\${$(echo $i)[FONCTION]}
+	COMMANDE_CONSTRUITE=\${$(echo $i)[COMMANDE]}
 	FONCTION=$(eval echo ${FONCTION_CONSTRUITE})
 	COMMANDE=$(eval echo ${COMMANDE_CONSTRUITE})
 	lancer "$FONCTION" "$COMMANDE" true
