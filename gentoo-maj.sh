@@ -29,8 +29,8 @@ typeset -A MESSAGE=(
 typeset -A JOURNAL=(
 	'DOSSIER'
 	"/var/log/gentooscripts"
-	'DATE'
-	"$(date +%F-%H%M%S).log"
+	'FICHIER'
+	"$(date '+%F-%H%M%S').log"
 )
 
 if [[ $SETVERBOSE -eq 1 ]]
@@ -162,49 +162,49 @@ function lancer
 function initialiseJournalScript
 {
 	FONCTION=$1
-	local JOURNAL="${JOURNAL[DOSSIER]}/${JOURNAL[DATE]}"
-	DATE="$(date +"%F %T")"
+	LOG="${JOURNAL[DOSSIER]}/${JOURNAL[FICHIER]}"
+	DATE="$(date '+%F %T')"
 	echo
 	echo "$FONCTION"
 	echo
-	echo "$DATE ($FONCTION) :: DEBUT" >> $JOURNAL
+	echo "$DATE ($FONCTION) :: DEBUT" >> $LOG
 }
 
 function finaliseJournalScript
 {
 	FONCTION=$1
-	local JOURNAL="${JOURNAL[DOSSIER]}/${JOURNAL[DATE]}"
-	DATE="$(date +"%F %T")"
+	LOG="${JOURNAL[DOSSIER]}/${JOURNAL[FICHIER]}"
+	DATE="$(date '+%F %T')"
 	echo
-	echo "$DATE ($FONCTION) :: FIN" >> $JOURNAL
+	echo "$DATE ($FONCTION) :: FIN" >> $LOG
 }
 
 function messageJournalScript
 {
 	RESULTAT=$1
 	FONCTION=$2
-	local JOURNAL="${JOURNAL[DOSSIER]}/${JOURNAL[DATE]}"
-	DATE="$(date +"%F %T")"
+	LOG="${JOURNAL[DOSSIER]}/${JOURNAL[FICHIER]}"
+	DATE="$(date '+%F %T')"
 	if [[ $RESULTAT -eq 0 ]]
 	then
-		echo "$DATE ($FONCTION) :: ${MESSAGE[OK]}" >> $JOURNAL
+		echo "$DATE ($FONCTION) :: ${MESSAGE[OK]}" >> $LOG
 	elif [[ $RESULTAT -eq 1 && $FONCTION == ${EUC[FONCTION]} ]]
 	then
-		echo "$DATE ($FONCTION) :: ${MESSAGE[OK]}" >> $JOURNAL
+		echo "$DATE ($FONCTION) :: ${MESSAGE[OK]}" >> $LOG
 		finaliseJournalScript "$FONCTION"
 	elif [[ $RESULTAT -eq 1 && $FONCTION != ${EUC[FONCTION]} ]]
 	then
 		echo
 		echo "$FONCTION :: ${MESSAGE[KO]}"
 		echo
-		echo "$DATE ($FONCTION) :: ${MESSAGE[KO]}" >> $JOURNAL
+		echo "$DATE ($FONCTION) :: ${MESSAGE[KO]}" >> $LOG
 		finaliseJournalScript "$FONCTION"
 		exit 1
 	else
 		echo
 		echo "$FONCTION :: ${MESSAGE[FATAL]}"
 		echo
-		echo "$DATE ($FONCTION) :: ${MESSAGE[FATAL]}" >> $JOURNAL
+		echo "$DATE ($FONCTION) :: ${MESSAGE[FATAL]}" >> $LOG
 		finaliseJournalScript "$FONCTION"
 		exit 2
 	fi
