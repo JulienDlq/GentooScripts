@@ -47,6 +47,7 @@ else
 fi
 
 typeset -a LISTEDEMAJ=(
+	EWFNUD
 	ESUNUD
 	EPR
 	EWUNUD
@@ -87,6 +88,12 @@ typeset -A SEP=(
 	"SYSTEM::UPDATE::PROFILE"
 	'COMMANDE'
 	"source /etc/profile"
+)
+typeset -A EWFNUD=(
+	'FONCTION'
+	"PORTAGE::FETCH::WORLD ( update ; new use ; deep )"
+	'COMMANDE'
+	"emerge $VERBOSE --quiet=y -NuD --with-bdeps=y --fetch-all-uri @world"
 )
 typeset -A ESUNUD=(
 	'FONCTION'
