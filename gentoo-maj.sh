@@ -49,9 +49,7 @@ fi
 typeset -a LISTEDEMAJ=(
 	EWFNUD
 	ESUNUD
-	EPR
 	EWUNUD
-	EPR
 	EC
 	EPR
 	RR
