@@ -64,14 +64,14 @@ my $variables = gestion_arguments(
 		'arguments' => {
 			'menuconfig' => {
 				'alias'   => 'm',
-				'usage'   => 'lancer menuconfig avant la compilation du noyau (oui ou non).',
+				'usage'   => 'lancer menuconfig avant la compilation du noyau, des modules et du fichier initramfs (oui ou non).',
 				'conf'    => $CONFIG->{'menuconfig'},
 				'defaut'  => 0,
 				'booleen' => 1,
 			},
 			'force' => {
 				'alias'  => 'f',
-				'usage'  => 'forcer la reconstruction du noyau.',
+				'usage'  => 'forcer la reconstruction du noyau, des modules et du fichier initramfs.',
 				'defaut' => 0,
 			},
 			'initramfs-update' => {
@@ -87,37 +87,6 @@ my $variables = gestion_arguments(
 # Lancement du programme principal
 
 my $SRC = '/usr/src';
-
-sub lancer_dracut {
-
-	my $parametres             = shift;
-	my $construction_initramfs = $parametres->{'construction_initramfs'};
-	my $noyau_a_construire     = $parametres->{'noyau_a_construire'};
-
-	if ($construction_initramfs) {
-
-		if ( -f $BOOT . '/initramfs-' . $noyau_a_construire . '-x86_64.img' ) {
-
-			journaliser('Sauvegarde du fichier initramfs précédent.');
-
-			executer( 'mv '
-				  . $BOOT
-				  . '/initramfs-'
-				  . $noyau_a_construire
-				  . '-x86_64.img '
-				  . $BOOT
-				  . '/initramfs-'
-				  . $noyau_a_construire
-				  . '-x86_64.old.img' );
-		}
-
-		journaliser('Lancement de la construction du fichier initramfs.');
-	} else {
-
-		journaliser('Lancement de la mise-à-jour du fichier initramfs.');
-	}
-	executer( 'dracut --hostonly --force --kver ' . $noyau_a_construire . '-x86_64' );
-}
 
 sub forcer {
 
@@ -197,17 +166,9 @@ if ( $variables->{'initramfs-update'} ) {
 # Execution
 if ( $variables->{'initramfs-update'} ) {
 
-	# Monter la partition
-	monter_boot();
+	journaliser('Lancement de la construction du fichier initramfs.');
+	executer( 'genkernel ' . $MENUCONFIG . ' initramfs' );
 
-	# Mise à jour du fichier initramfs
-	lancer_dracut( {
-		'construction_initramfs' => 0,
-		'noyau_a_construire'     => $noyau_a_construire,
-	} );
-
-	# Démonter la partition
-	demonter_boot();
 } else {
 
 	# Dans le cas où il faut construire
@@ -216,23 +177,9 @@ if ( $variables->{'initramfs-update'} ) {
 	journaliser('Récupération de la configuration du noyau actuel');
 	executer( 'cp -v /usr/src/linux-' . $noyau_actuel . '/.config /usr/src/linux/.config' );
 
-	journaliser('Lancement de la construction du noyau.');
-	executer( 'genkernel ' . $MENUCONFIG . ' kernel' );
-
-	# Monter la partition
-	monter_boot();
-
-	# Mise à jour du fichier initramfs
-	lancer_dracut( {
-		'construction_initramfs' => 1,
-		'noyau_a_construire'     => $noyau_a_construire,
-	} );
-
-	# Démonter la partition
-	demonter_boot();
+	journaliser('Lancement de la construction du noyau, des modules et du fichier initramfs.');
+	executer( 'genkernel ' . $MENUCONFIG . ' all' );
 }
-
-journaliser('Il ne reste plus qu\'à reconfigurer le grub.');
 
 exit 0;
 
