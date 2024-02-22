@@ -6,7 +6,6 @@ use feature 'say';
 use Carp;
 use Cwd;
 use File::Basename;
-use File::Path qw(remove_tree);
 use Getopt::Long qw(GetOptions);
 Getopt::Long::Configure qw(gnu_getopt);
 use Sort::Versions;
