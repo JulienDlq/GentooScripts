@@ -5,8 +5,6 @@ use warnings;
 use feature 'say';
 use Carp;
 use File::Basename;
-use Getopt::Long qw(GetOptions);
-Getopt::Long::Configure qw(gnu_getopt);
 use Sort::Versions;
 
 my $NOM_DU_SCRIPT;
