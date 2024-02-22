@@ -7,8 +7,6 @@ use Carp;
 use Cwd;
 use File::Basename;
 use File::Path qw(remove_tree);
-use Getopt::Long qw(GetOptions);
-Getopt::Long::Configure qw(gnu_getopt);
 
 my $REPERTOIRE_DE_TRAVAIL;
 my $NOM_DU_SCRIPT;
