@@ -5,7 +5,6 @@ use warnings;
 use feature 'say';
 use Carp;
 use File::Basename;
-use Sort::Versions;
 
 my $NOM_DU_SCRIPT;
 my $CHEMIN_DU_SCRIPT;
