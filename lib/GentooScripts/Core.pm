@@ -16,9 +16,11 @@ Getopt::Long::Configure qw(gnu_getopt);
 
 # Permet d'appeler say mais avec une date locale avant
 sub journaliser {
-	my $texte = shift // croak('pas de texte fourni pour journaliser.');
+	my $texte     = shift // croak('pas de texte fourni pour journaliser.');
+	my $localtime = localtime();
+
 	print "\n";
-	say localtime() . ' ' . $texte;
+	say $localtime . ' ' . $texte;
 	print "\n";
 }
 
@@ -34,7 +36,7 @@ sub verification_admin {
 sub executer {
 	my $commande = shift // croak('pas de commande fournie pour executer');
 
-	system $commande;
+	system($commande);
 
 	if ( $? == -1 ) {
 		journaliser 'Problème d\'exécution: ' . $! . '\n';
