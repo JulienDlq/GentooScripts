@@ -4,17 +4,23 @@ use strict;
 use warnings;
 use feature 'say';
 use Carp;
+use Cwd;
 use File::Basename;
 
+my $REPERTOIRE_DE_TRAVAIL;
 my $NOM_DU_SCRIPT;
 my $CHEMIN_DU_SCRIPT;
+my $CHEMIN_ABSOLUT_DU_SCRIPT;
 my $LIB;
 
 BEGIN {
 	$NOM_DU_SCRIPT    = basename($0);
 	$CHEMIN_DU_SCRIPT = dirname($0);
+
 	chdir $CHEMIN_DU_SCRIPT;
-	$LIB = $CHEMIN_DU_SCRIPT . '/lib';
+
+	$REPERTOIRE_DE_TRAVAIL = getcwd();
+	$LIB                   = $REPERTOIRE_DE_TRAVAIL . '/lib';
 }
 
 ###
