@@ -1,7 +1,7 @@
 # GentooScripts
 Quelques scripts pour gérer facilement une Gentoo ; ils sont pour le moment au nombre de 6.
 
-## gentoo-maj.sh
+## gentoo-maj.pl
 Ce script permet de mettre à jour simplement et rapidement une Gentoo.
 
 ## gentoo-kernel.pl
@@ -10,10 +10,7 @@ Ce script permet de construire le noyau GNU/Linux simplement et rapidement pour 
 ## gentoo-grub.pl
 Ce script permet de mettre à jour simplement et rapidement la configuration de grub en fonction des noyaux présents dans /boot.
 
-## gentoo-monitor.sh
-Ce script permet de monitorer simplement et rapidement le système Gentoo pendant les mises à jour.
-
-## gentoo-tail.sh
+## gentoo-tail.pl
 Ce script permet de suivre simplement et rapidement le fichier journal de la compilation en cours sur un système Gentoo.
 
 ## gentoo-borg-save.pl
