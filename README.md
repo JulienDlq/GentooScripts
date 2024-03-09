@@ -1,5 +1,5 @@
 # GentooScripts
-Quelques scripts pour gérer facilement une Gentoo ; ils sont pour le moment au nombre de 6.
+Quelques scripts pour gérer facilement une Gentoo ; ils sont pour le moment au nombre de 5.
 
 ## gentoo-maj.pl
 Ce script permet de mettre à jour simplement et rapidement une Gentoo.
