@@ -124,15 +124,15 @@ my $eic = {
 };
 my $ewfnud = {
 	'fonction' => 'PORTAGE::FETCH::WORLD ( update ; new use ; deep )',
-	'commande' => 'emerge' . $verbose . ' --quiet=y -NuD --with-bdeps=y --fetch-all-uri @world',
+	'commande' => 'emerge' . $verbose . ' --quiet=y -NuD --with-bdeps=y --backtrack=30 --fetch-all-uri @world',
 };
 my $esunud = {
 	'fonction' => 'PORTAGE::EMERGE::SYSTEM ( update ; new use ; deep )',
-	'commande' => 'emerge' . $verbose . $quiet . ' -NuD --with-bdeps=y @system',
+	'commande' => 'emerge' . $verbose . $quiet . ' -NuD --with-bdeps=y --backtrack=30 @system',
 };
 my $ewunud = {
 	'fonction' => 'PORTAGE::EMERGE::WORLD ( update ; new use ; deep )',
-	'commande' => 'emerge' . $verbose . $quiet . ' -NuD --with-bdeps=y @world',
+	'commande' => 'emerge' . $verbose . $quiet . ' -NuD --with-bdeps=y --backtrack=30 @world',
 };
 my $epr = {
 	'fonction' => 'PORTAGE::EMERGE::PRESERVEDREBUILD',
