@@ -107,8 +107,9 @@ my $journal = {
 	'fichier' => $date . '.log',
 };
 
-my $verbose = ( $CONFIG->{'verbose'} ? ' --verbose' : '' );
-my $quiet   = ' --quiet-build ' . ( $CONFIG->{'quiet'} ? 'y' : 'n' );
+my $verbose   = ( $CONFIG->{'verbose'} ? ' --verbose' : '' );
+my $quiet     = ' --quiet-build ' . ( $CONFIG->{'quiet'} ? 'y' : 'n' );
+my $backtrack = ' --backtrack=' . ( defined( $CONFIG->{'backtrack'} ) ? $CONFIG->{'backtrack'} : '30' );
 
 my $es = {
 	'fonction' => 'PORTAGE::SYNC',
@@ -124,15 +125,15 @@ my $eic = {
 };
 my $ewfnud = {
 	'fonction' => 'PORTAGE::FETCH::WORLD ( update ; new use ; deep )',
-	'commande' => 'emerge' . $verbose . ' --quiet=y -NuD --with-bdeps=y --backtrack=30 --fetch-all-uri @world',
+	'commande' => 'emerge' . $verbose . ' --quiet=y -NuD --with-bdeps=y' . $backtrack . ' --fetch-all-uri @world',
 };
 my $esunud = {
 	'fonction' => 'PORTAGE::EMERGE::SYSTEM ( update ; new use ; deep )',
-	'commande' => 'emerge' . $verbose . $quiet . ' -NuD --with-bdeps=y --backtrack=30 @system',
+	'commande' => 'emerge' . $verbose . $quiet . ' -NuD --with-bdeps=y' . $backtrack . ' @system',
 };
 my $ewunud = {
 	'fonction' => 'PORTAGE::EMERGE::WORLD ( update ; new use ; deep )',
-	'commande' => 'emerge' . $verbose . $quiet . ' -NuD --with-bdeps=y --backtrack=30 @world',
+	'commande' => 'emerge' . $verbose . $quiet . ' -NuD --with-bdeps=y' . $backtrack . ' @world',
 };
 my $epr = {
 	'fonction' => 'PORTAGE::EMERGE::PRESERVEDREBUILD',
