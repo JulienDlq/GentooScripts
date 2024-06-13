@@ -127,10 +127,6 @@ my $ewfnud = {
 	'fonction' => 'PORTAGE::FETCH::WORLD ( update ; new use ; deep )',
 	'commande' => 'emerge' . $verbose . ' --quiet=y -NuD --with-bdeps=y' . $backtrack . ' --fetch-all-uri @world',
 };
-my $esunud = {
-	'fonction' => 'PORTAGE::EMERGE::SYSTEM ( update ; new use ; deep )',
-	'commande' => 'emerge' . $verbose . $quiet . ' -NuD --with-bdeps=y' . $backtrack . ' @system',
-};
 my $ewunud = {
 	'fonction' => 'PORTAGE::EMERGE::WORLD ( update ; new use ; deep )',
 	'commande' => 'emerge' . $verbose . $quiet . ' -NuD --with-bdeps=y' . $backtrack . ' @world',
@@ -156,7 +152,7 @@ my $ed = {
 	'commande' => 'eclean -v distfiles',
 };
 
-my $liste_de_maj = [ $ewfnud, $esunud, $ewunud, $ec, $epr, $rr, $eu, $ed, ];
+my $liste_de_maj = [ $ewfnud, $ewunud, $ec, $epr, $rr, $eu, $ed, ];
 
 ###
 # Fonctions
