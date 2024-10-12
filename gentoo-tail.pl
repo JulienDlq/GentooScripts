@@ -38,17 +38,14 @@ my $compilations_connues = {};
 
 sub recuperation_compilations_en_cours {
 
-	# Récupération des compilations en cours (avec filtre sur l’étoile indiquant chaque paquet)
-	# mais chacunes d’elles sont encore avec des caractères en trop dans leur chaîne de caractère
-	my @compilations_en_cours_brutes = grep { /^ \*/ } `genlop -c`;
+	# Récupération des compilations en cours
+	my @compilations_en_cours_brutes = `cd /var/tmp/portage ; find . -mindepth 2 -maxdepth 2 -type d`;
 
 	# Préparation du stockage des compilations en cours (nettoyées de leurs caractères inutiles)
 	my @compilations_en_cours_propres = ();
 
 	# Suppression des caractères inutiles au début et à la fin et stockage
 	foreach my $nom (@compilations_en_cours_brutes) {
-		$nom =~ s/^ \* //;                               # En début de ligne : l’espace, l’étoile, et l’espace
-		$nom =~ s/ *$//;                                 # En fin de ligne : les éventuels espaces
 		chomp($nom);                                     # Suppression du saut de ligne final
 		push( @compilations_en_cours_propres, $nom );    # Stockage
 	}
