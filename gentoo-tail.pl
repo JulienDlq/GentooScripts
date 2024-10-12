@@ -39,7 +39,7 @@ my $compilations_connues = {};
 sub recuperation_compilations_en_cours {
 
 	# Récupération des compilations en cours
-	my @compilations_en_cours_brutes = `cd /var/tmp/portage ; find . -mindepth 2 -maxdepth 2 -type d`;
+	my @compilations_en_cours_brutes = `find /var/tmp/portage -mindepth 2 -maxdepth 2 -type d`;
 
 	# Préparation du stockage des compilations en cours (nettoyées de leurs caractères inutiles)
 	my @compilations_en_cours_propres = ();
@@ -133,7 +133,7 @@ do {
 				close(STDERR);
 
 				# Exécution effective de tail
-				exec('tail -n0 -F /var/tmp/portage/' . $element . '/temp/build.log') or print STDERR "impossible d’exécuter la commande : $!";
+				exec('tail -n0 -F ' . $element . '/temp/build.log') or print STDERR "impossible d’exécuter la commande : $!";
 				exit 0;
 			}
 
