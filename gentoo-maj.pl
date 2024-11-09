@@ -117,7 +117,7 @@ my $es = {
 };
 my $euc = {
 	'fonction' => 'PORTAGE::LIST::UPDATE',
-	'commande' => 'eix -u -c',
+	'commande' => 'EIX_LIMIT_COMPACT=0 eix -u -c',
 };
 my $eic = {
 	'fonction' => 'PORTAGE::LIST::INSTALLED',
