@@ -93,8 +93,7 @@ my $variables = gestion_arguments(
 			},
 			'supprime' => {
 				'alias' => 's',
-				'usage' => 'supprime une sauvegarde dans le dépôt sélectionné.',
-				'type'  => 's',
+				'usage' => 'supprime la sauvegarde sélectionnée dans le dépôt sélectionné.',
 			},
 			'prune' => {
 				'alias' => 'p',
@@ -331,15 +330,21 @@ sub supprime_sauvegardes {
 		# Le code s'arrête si le dépot en question n'est pas cohérent
 		verification_coherence_depot($depot);
 
+		if ( not defined( $variables->{'nom-sauvegarde'} ) ) {
+
+			journaliser( 'Aucune sauvegarde précisée.' );
+			exit 0;
+		}
+
 		journaliser( 'Suppression de la sauvegarde '
-			  . $variables->{'supprime'}
+			  . $variables->{'nom-sauvegarde'}
 			  . ' du dépôt '
 			  . $depots->{$depot}->{'nom'}
 			  . '.' );
 
 		# Lancer la commande borg
 		my $prefixe_commande = $source_passphrase . ' ; export BORG_REPO=' . $depots->{$depot}->{'chemin'};
-		system $prefixe_commande . '; borg delete ::' . $variables->{'supprime'};
+		system $prefixe_commande . '; borg delete ::' . $variables->{'nom-sauvegarde'};
 
 	} else {
 
