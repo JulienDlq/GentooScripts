@@ -125,20 +125,30 @@ sub verification_existance_depot {
 	my $creation     = $parametres->{'creation'} // 0;
 
 	if ( not exists( $depots->{$depot} ) ) {
+
 		journaliser( 'Le dépôt ' . $depot . ' est inconnu dans la configuration.' );
 		exit 0;
 	}
 
-	if ( ( not $creation ) and ( not -d $depots->{$depot}->{'chemin'} ) ) {
-		journaliser( 'Le dépôt ' . $depot . ' n\'existe pas dans ' . $depots_borgbackup . '.' );
-		exit 0;
-	}
+	if ( exists( $depots->{$depot}->{'ssh'} ) and $depots->{$depot}->{'ssh'} ) {
 
-	if ( ($creation) and ( -d $depots->{$depot}->{'chemin'} ) ) {
-		journaliser( 'Le dépôt ' . $depot . ' existe déjà dans ' . $depots_borgbackup . '.' );
-		exit 0;
+		journaliser( 'Le dépôt ' . $depot . ' est un dépôt SSH, pas de vérification d’existance.' );
+	} else {
+		if ( ( not $creation ) and ( not -d $depots->{$depot}->{'chemin'} ) ) {
+
+			journaliser( 'Le dépôt ' . $depot . ' n\'existe pas dans ' . $depots_borgbackup . '.' );
+			exit 0;
+		}
+
+		if ( ($creation) and ( -d $depots->{$depot}->{'chemin'} ) ) {
+
+			journaliser( 'Le dépôt ' . $depot . ' existe déjà dans ' . $depots_borgbackup . '.' );
+			exit 0;
+		}
 	}
 }
+
+
 
 sub verification_coherence_depot {
 
