@@ -39,7 +39,7 @@ my $compilations_connues = {};
 sub recuperation_compilations_en_cours {
 
 	# Récupération des compilations en cours
-	my @compilations_en_cours_brutes = `find /var/tmp/portage -mindepth 2 -maxdepth 2 -type d`;
+	my @compilations_en_cours_brutes = `find /var/tmp/portage -mindepth 2 -maxdepth 2 -type d | grep -v .distcc`;
 
 	# Préparation du stockage des compilations en cours (nettoyées de leurs caractères inutiles)
 	my @compilations_en_cours_propres = ();
