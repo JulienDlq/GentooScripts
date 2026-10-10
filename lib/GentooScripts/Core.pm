@@ -11,6 +11,8 @@ use feature 'say';
 use Carp;
 use Data::Dumper;
 
+use List::Util qw(max);
+
 use Getopt::Long qw(GetOptions);
 Getopt::Long::Configure qw(gnu_getopt);
 
@@ -69,15 +71,16 @@ sub gestion_arguments {
 	};
 
 	# Récupération de la taille des arguments et de la taille de l'argument le plus long
-	our $taille_arguments = {};
-	$taille_arguments->{'max'} = 0;
+	our $taille_arguments = {
+		'max'       => 0,
+		'arguments' => {},
+	};
 
 	foreach my $curr_argument ( @{ $configuration->{'usage_ordre'} } ) {
 		$taille_arguments->{'arguments'}->{$curr_argument} = length($curr_argument);
-		if ( $taille_arguments->{'arguments'}->{$curr_argument} > $taille_arguments->{'max'} ) {
-			$taille_arguments->{'max'} = $taille_arguments->{'arguments'}->{$curr_argument};
-		}
 	}
+
+	$taille_arguments->{'max'} = max(values %{ $taille_arguments->{'arguments'} });
 
 	# Construction de l'usage
 	sub usage {
