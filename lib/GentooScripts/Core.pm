@@ -26,7 +26,7 @@ sub journaliser {
 
 # Forcer les scripts à être lancés en root seulement
 sub verification_admin {
-	if ( getpwnam( $ENV{'USER'} ) != 0 ) {
+	if ($> != 0) {
 		print 'Utiliser sudo pour lancer le script' . "\n";
 		exit 1;
 	}
