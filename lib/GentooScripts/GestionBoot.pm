@@ -19,12 +19,11 @@ our $BOOT = '/boot';
 # Monter la partition de boot
 sub monter_boot {
 
-	# Vérification pour éviter d'avoir des messages d'erreur prévisible
-	# de la commande mount
+	# Vérification de l'état du montage pour éviter des erreurs
 	my $sortie_mount =
-	  executer( 'mount | grep ' . $BOOT . ' 2>/dev/null 1>&2' );
+	  executer( 'findmnt ' . $BOOT . ' > /dev/null 2>&1' );
 
-	if ( $sortie_mount == 1 ) {
+	if ( $sortie_mount != 0 ) {
 
 		journaliser( 'La partition ' . $BOOT . ' va être montée.' );
 		system 'mount ' . $BOOT;
@@ -42,10 +41,9 @@ sub monter_boot {
 # Démonter la partition de boot
 sub demonter_boot {
 
-	# Vérification pour éviter d'avoir des messages d'erreur prévisible
-	# de la commande umount
+	# Vérification de l'état du montage pour éviter des erreurs
 	my $sortie_mount =
-	  executer( 'mount | grep ' . $BOOT . ' 2>/dev/null 1>&2' );
+	  executer( 'findmnt ' . $BOOT . ' > /dev/null 2>&1' );
 
 	if ( $sortie_mount == 0 ) {
 
